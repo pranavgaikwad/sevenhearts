@@ -13,8 +13,11 @@ import com.comyr.pg18.sevenhearts.ui.utils.CustomResolution;
  */
 public class ResolutionHelper {
     public static final int VIEW_CARD = 0;
+    public static final int VIEW_PLAYER = 1;
     private static ResolutionHelper instance;
+    private final String TAG = "ResolutionHelper";
     private CustomResolution screenResolution;
+
 
     public ResolutionHelper() {
 
@@ -26,6 +29,11 @@ public class ResolutionHelper {
         return instance;
     }
 
+    /**
+     * loads current screen resolution
+     *
+     * @param context context for activity
+     */
     public void loadScreenResolution(Context context) {
         WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = wm.getDefaultDisplay();
@@ -57,10 +65,10 @@ public class ResolutionHelper {
      * @param context Context to get resources and device specific display metrics
      * @return A float value to represent dp equivalent to px value
      */
-    public int convertPixelsToDp(int px, Context context) {
+    public int convertPixelsToDp(float px, Context context) {
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float dp = (float) px / ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        float dp = px / ((float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
         return (int) dp;
     }
 
@@ -68,13 +76,51 @@ public class ResolutionHelper {
         CustomResolution res;
         switch (view) {
             case VIEW_CARD:
-                res = screenResolution.getResolutionByPercentage(10, 24);
+                ValuePair vp = getPossibleResolution();
+                res = screenResolution.getResolutionByPercentage(vp.getW(), vp.getH());
+                break;
+            case VIEW_PLAYER:
+                res = screenResolution.getResolutionByPercentage(12);
                 break;
             default:
                 res = screenResolution;
                 break;
         }
         return res;
+    }
+
+    /**
+     * generates possible resolution for a card based on the
+     * current aspect ratio of the screen
+     * considering a linear relation between aspect ratio and height of the card,
+     * for aspect ratio of 0.60, dimensions 9 x 20 are suited best
+     * for aspect ratio of p, dimensions are 9 x 20 x p / 0.60
+     *
+     * @return ValuePair just binds height and weight together in an object
+     */
+    private ValuePair getPossibleResolution() {
+        double p = screenResolution.getRatio();
+        double heightValue = (25.0 / 0.60 * p);
+        double widthValue = (10.5 / 0.60 * p);
+        return new ValuePair((int) widthValue, (int) heightValue);
+    }
+
+    private class ValuePair {
+        private int w;
+        private int h;
+
+        public ValuePair(int w, int h) {
+            this.w = w;
+            this.h = h;
+        }
+
+        public int getH() {
+            return h;
+        }
+
+        public int getW() {
+            return w;
+        }
     }
 
 }

@@ -41,6 +41,10 @@ public class Table {
         currentPlayerIndex = 0;
     }
 
+    public static void reset() {
+        instance = null;
+    }
+
     public static Table getInstance(TableStateChangeListener l, Player... players) {
         if (instance == null) {
             instance = new Table(l, players);
@@ -51,6 +55,10 @@ public class Table {
     public static Table getInstance() throws NullTableException {
         if (instance != null) return instance;
         throw new NullTableException(Constants.MESSAGE_NULL_TABLE);
+    }
+
+    public ArrayList<Card> getCards() {
+        return cards;
     }
 
     /**
@@ -86,11 +94,31 @@ public class Table {
      * initiation tasks that are not allowed
      * to be in default constructor
      *
-     * @param players {@link Player} objects as an array {@link Player}
      */
-    public void init(Player... players) {
+    public void init() {
         this.deck.shuffle();
+        updateTableStatus();
+    }
+
+    public void distributeCards() {
         this.deck.distributeCardsToPlayers();
+        try {
+            Player p = whoHasSevenOfHearts();
+            if (p != null)
+                this.currentPlayerIndex = getPlayerIndex(p);
+            else
+                throw new PlayerNotFoundException();
+        } catch (PlayerNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void removeAllCards() {
+        int i = cards.size() - 1;
+        for (Card c : cards) {
+            cards.remove(i);
+            i--;
+        }
         updateTableStatus();
     }
 

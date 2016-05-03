@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#D32F2F</color>
-    <color name="colorPrimaryDark">#D32F2F</color>
-    <color name="colorAccent">#303F9F</color>
+    <color name="colorPrimary">#673AB7</color>
+    <color name="colorPrimaryDark">#512DA8</color>
+    <color name="colorAccent">#a0a0a0</color>
+
+    <color name="current_player_background_color">#9063D1F4</color>
+    <color name="transparent">@android:color/transparent</color>
+    <color name="white">@android:color/white</color>
 </resources>

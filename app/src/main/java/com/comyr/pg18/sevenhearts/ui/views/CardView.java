@@ -38,6 +38,40 @@ public class CardView extends Button {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
+    public void setCard(Card card, boolean isTableCard) {
+        this.card = card;
+        this.bgResName = card.getBackgroundResourceName();
+        ResolutionHelper.getInstance().loadScreenResolution(getContext());
+        CustomResolution res = ResolutionHelper.getInstance().getResolutionForView(ResolutionHelper.VIEW_CARD);
+        heightInPixels = (int) ((double) res.getHeight() / 1.2);
+        widthInPixels = (int) ((double) res.getWidth() / 1.2);
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(widthInPixels, heightInPixels);
+        params.setMargins(0, 10, 0, 0);
+        setLayoutParams(params);
+        setBackgroundResource(getResources().getIdentifier(card.getBackgroundResourceName(), "drawable", getContext().getPackageName()));
+    }
+
+    /**
+     * used to overlap the card over another card inside
+     * a linear layout
+     */
+    public void setNegativeMargin() {
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(widthInPixels, heightInPixels);
+        int marginInDp = ResolutionHelper.getInstance().convertPixelsToDp((float) (widthInPixels / 1.1), getContext());
+        params.setMargins(marginInDp * -1, 0, 0, 0);
+        setLayoutParams(params);
+    }
+
+    public Card getCard() {
+        return card;
+    }
+
+    /**
+     * links a card object along with the view
+     *
+     * @param card {@link Card}
+     */
     public void setCard(Card card) {
         this.card = card;
         this.bgResName = card.getBackgroundResourceName();
@@ -51,10 +85,4 @@ public class CardView extends Button {
         setBackgroundResource(getResources().getIdentifier(card.getBackgroundResourceName(), "drawable", getContext().getPackageName()));
     }
 
-    public void setNegativeMargin() {
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(widthInPixels, heightInPixels);
-        int marginInDp = ResolutionHelper.getInstance().convertPixelsToDp((int) (widthInPixels / 1.1), getContext());
-        params.setMargins(marginInDp * -1, 0, 0, 0);
-        setLayoutParams(params);
-    }
 }

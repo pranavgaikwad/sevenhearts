@@ -105,6 +105,27 @@ public class Deck {
         }
     }
 
+    /**
+     * collects all the cards from the table and players
+     * re-shuffles the deck
+     * gets ready for a new game
+     */
+    public void collectCardsFromTable() {
+        int i = 0, temp;
+        try {
+            for (Player p : Table.getInstance().getPlayers()) {
+                cards.addAll(p.getCards());
+                p.removeAllCards();
+            }
+            cards.addAll(Table.getInstance().getCards());
+            Table.getInstance().removeAllCards();
+            this.shuffle();
+        } catch (NullTableException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public String toString() {
         // TODO Auto-generated method stub

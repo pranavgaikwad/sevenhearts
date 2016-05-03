@@ -20,6 +20,7 @@ public class ActivityOptionHelper {
                 break;
             case ACTIVITY_MAIN:
                 options.addNewOption(CustomActivityOptions.OPTION_LANDSCAPE);
+                options.addNewOption(CustomActivityOptions.OPTION_NO_ACTION_BAR);
                 break;
         }
         return options;

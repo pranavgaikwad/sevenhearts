@@ -16,6 +16,9 @@ public class Card {
     private String rankName;
     private String suitName;
 
+    // used to set id for view
+    private int identifier;
+
     /**
      * initialize card with rank and suit as integers
      *
@@ -57,6 +60,11 @@ public class Card {
         this.rankName = Constants.CARDS[this.rank];
         this.suitName = Constants.SUITS[this.suit];
         this.id = new String(getMD5(rankName + suitName), StandardCharsets.UTF_8);
+        this.identifier = rank + (10 * suit);
+    }
+
+    public int getIdentifier() {
+        return identifier;
     }
 
     /**
@@ -133,8 +141,10 @@ public class Card {
     }
 
     public String getBackgroundResourceName() {
-        if ((rank == 0) || (rank > 9))
-            return rankName.toLowerCase() + "_of_" + suitName.toLowerCase();
-        return String.valueOf(rank + 1) + "_of_" + suitName.toLowerCase();
+        return rankName.toLowerCase() + "_of_" + suitName.toLowerCase();
+    }
+
+    public int compareTo(Card c) {
+        return compareCardRankWith(c);
     }
 }

@@ -38,7 +38,7 @@ public class Game implements TableStateChangeListener, PlayerStateChangeListener
             i++;
         }
         this.table = Table.getInstance(this, players);
-        this.table.init(players);
+        this.table.init();
         this.deck = this.table.getDeck();
         init(players);
     }
@@ -183,6 +183,16 @@ public class Game implements TableStateChangeListener, PlayerStateChangeListener
     @Override
     public void onPlayerCardsExhausted(Player p, String status) {
         // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void onPlayerSuitsRefreshed(Player p) {
+
+    }
+
+    @Override
+    public void onOnAllPageSure(Player p) {
 
     }
 

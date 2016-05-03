@@ -7,6 +7,7 @@ import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.Random;
 
 public class Suit {
@@ -129,6 +130,14 @@ public class Suit {
             cards.add(c);
         }
         updateAvailableCards();
+    }
+
+    public void removeAllCards() {
+        Iterator<Card> iter = cards.iterator();
+        while (iter.hasNext()) {
+            Card card = iter.next();
+            iter.remove();
+        }
     }
 
     /**

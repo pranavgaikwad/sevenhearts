@@ -4,13 +4,20 @@ import android.annotation.TargetApi;
 import android.os.Build;
 
 import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
+import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
 import com.comyr.pg18.sevenhearts.game.resources.utils.PlayerStateChangeListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.CardNotFoundException;
+import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.NullTableException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
+
+import static java.util.Collections.sort;
 
 public class Player {
     private String id;
@@ -22,6 +29,8 @@ public class Player {
 
     private ArrayList<Card> cards;
     private PlayerStateChangeListener l;
+
+    private ArrayList<Suit> localSuits;
 
     /**
      * creates new player with
@@ -56,6 +65,75 @@ public class Player {
      */
     public void init() {
         cards = new ArrayList<Card>();
+        localSuits = new ArrayList<Suit>();
+        localSuits.add(new Suit(Suits.CLUBS));
+        localSuits.add(new Suit(Suits.DIAMONDS));
+        localSuits.add(new Suit(Suits.HEARTS));
+        localSuits.add(new Suit(Suits.SPADES));
+    }
+
+    public ArrayList<Suit> getLocalSuits() {
+        return localSuits;
+    }
+
+    public boolean isAllPageSure() {
+        try {
+            return equalLists(cards, Table.getInstance().getAvailableMovesFor(this));
+        } catch (NullTableException e) {
+            return false;
+        }
+    }
+
+    private boolean equalLists(List<Card> one, List<Card> two) {
+        if (one == null && two == null) {
+            return true;
+        }
+
+        if ((one == null && two != null)
+                || one != null && two == null
+                || one.size() != two.size()) {
+            return false;
+        }
+
+        //to avoid messing the order of the lists we will use a copy
+        //as noted in comments by A. R. S.
+        one = new ArrayList<Card>(one);
+        two = new ArrayList<Card>(two);
+
+        sort(one, new Comparator<Card>() {
+            @Override
+            public int compare(Card lhs, Card rhs) {
+                return lhs.compareTo(rhs);
+            }
+        });
+        sort(two, new Comparator<Card>() {
+            @Override
+            public int compare(Card lhs, Card rhs) {
+                return lhs.compareTo(rhs);
+            }
+        });
+        return one.equals(two);
+    }
+
+    /**
+     * re-arranges all the cards into suits
+     *
+     * @param l state change listener {@link PlayerStateChangeListener}
+     */
+    private void updateSuits(PlayerStateChangeListener l) {
+        for (Suit s : localSuits) {
+            s.removeAllCards();
+        }
+        for (Card c : cards)
+            for (Suit s : localSuits) {
+                if (c.getSuit() == s.getSuit()) s.addNewCard(c);
+            }
+        cards = new ArrayList<>();
+        for (Suit s : localSuits) {
+            s.sort();
+            cards.addAll(s.getCards());
+        }
+        l.onPlayerSuitsRefreshed(this);
     }
 
     public String getName() {
@@ -80,7 +158,17 @@ public class Player {
     public void giveCard(Card c) {
         cards.add(c);
         if (areCardsExhausted()) l.onPlayerCardsExhausted(this);
+        updatePlayerState();
+    }
+
+    private void updatePlayerState() {
         updateScore();
+        updateSuits(l);
+        checkAllPageSure();
+    }
+
+    private void checkAllPageSure() {
+        if (isAllPageSure()) l.onOnAllPageSure(this);
     }
 
     /**
@@ -113,12 +201,19 @@ public class Player {
             return null;
         }
         Card ct = cards.get(index);
-        System.out.println("index : " + String.valueOf(index));
         cards.remove(index);
         if (areCardsExhausted())
             l.onPlayerCardsExhausted(this);
-        updateScore();
+        updatePlayerState();
         return ct;
+    }
+
+    public void removeAllCards() {
+        Iterator it = cards.iterator();
+        while (it.hasNext()) {
+            it.remove();
+        }
+        updateSuits(l);
     }
 
     /**
@@ -155,10 +250,7 @@ public class Player {
      */
     private boolean areCardsExhausted() {
         if (cards.isEmpty()) return true;
-        for (Card c : cards) {
-            if (c != null) return false;
-        }
-        return true;
+        return false;
     }
 
     /**

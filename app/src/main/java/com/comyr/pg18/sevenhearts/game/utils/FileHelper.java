@@ -36,17 +36,6 @@ public class FileHelper {
     }
 
     public void appendStringToGameFile(String s) {
-//		BufferedWriter bw = null;
-//		try {
-//			// APPEND MODE SET HERE
-//			bw = new BufferedWriter(new FileWriter(FILE_GAME, true));
-//			bw.write(s);
-//			bw.newLine();
-//			bw.flush();
-//			bw.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
         printToTerminal(s);
     }
 

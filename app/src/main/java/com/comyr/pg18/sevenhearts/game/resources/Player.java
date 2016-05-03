@@ -249,8 +249,7 @@ public class Player {
      * @return true if player is out of cards, false otherwise
      */
     private boolean areCardsExhausted() {
-        if (cards.isEmpty()) return true;
-        return false;
+        return cards.isEmpty();
     }
 
     /**
@@ -277,8 +276,7 @@ public class Player {
     public boolean equals(Object obj) {
         // TODO Auto-generated method stub
         Player p = (Player) obj;
-        if (p.getId().equals(id)) return true;
-        return false;
+        return p.getId().equals(id);
     }
 
     @Override

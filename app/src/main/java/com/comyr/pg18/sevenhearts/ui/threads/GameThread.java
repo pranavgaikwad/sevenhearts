@@ -1,13 +1,16 @@
 package com.comyr.pg18.sevenhearts.ui.threads;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.text.Html;
 import android.util.Log;
-import android.widget.Toast;
+import android.view.View;
 
 import com.comyr.pg18.sevenhearts.game.resources.Card;
 import com.comyr.pg18.sevenhearts.game.resources.Player;
 import com.comyr.pg18.sevenhearts.game.solution.Solver;
 import com.comyr.pg18.sevenhearts.ui.activities.GameActivity;
+import com.comyr.pg18.sevenhearts.ui.views.CardView;
 import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
 
 /**
@@ -20,25 +23,17 @@ public class GameThread implements Runnable {
     public static Card currentMove;
     public static Player currentPlayer;
     private final String TAG = "TestThread";
+    int i = 0;
     private Thread thread;
     private String name;
     private boolean suspended = false;
     private GameActivity activity;
-
-//    private static GameThread instance = null;
 
     public GameThread(GameActivity activity) {
         this.activity = activity;
         this.name = "Game Thread";
         Log.d(TAG, "creating " + name);
     }
-
-//    public static GameThread getInstance(GameActivity activity) {
-//        if(instance == null) {
-//            instance = new GameThread(activity);
-//        }
-//        return instance;
-//    }
 
     public String getName() {
         return name;
@@ -54,19 +49,20 @@ public class GameThread implements Runnable {
             while (!isFinished) {// Let the thread sleep for a while.
                 Thread.sleep(500);
                 currentPlayer = GameActivity.getTable().getCurrentPlayer();
-                Log.d(TAG, currentPlayer.getName());
+                Log.d("__special__", "move : " + currentPlayer.getName() + " cards : " + currentPlayer.getCards().toString());
+                Log.d("__special__", "     : " + "available cards : " + GameActivity.getTable().getAvailableMovesFor(currentPlayer));
                 if (currentPlayer.equals(GameActivity.getThisPlayer())) {
                     if (GameActivity.getTable().getAvailableMovesFor(currentPlayer).isEmpty()) {
                         GameActivity.getTable().incrementCurrentPlayerIndex();
                         Thread.sleep(1500);
                         // show that the player has passed this move
-                        activity.showPlayerPassed(currentPlayer);
+                        showPlayerPassed(currentPlayer);
                         // wait till UI refreshes
                         waitTillNextInput();
 
                         continue;
                     } else {
-                        Thread.sleep(1000);
+                        Thread.sleep(1500);
 
                         showPlayerThinking(currentPlayer);
                         // wait to show ui
@@ -88,8 +84,12 @@ public class GameThread implements Runnable {
                         synchronized (GameActivity.getTable()) {
                             GameActivity.getTable().addNewCardToTable(currentMove);
                         }
+
+                        addNewCardToTable(currentMove);
+                        waitTillNextInput();
+
                         // show played move
-                        activity.showPlayedMove(currentPlayer, currentMove);
+                        showPlayedMove(currentPlayer, currentMove);
                         // wait for ui refresh
                         waitTillNextInput();
 
@@ -97,20 +97,22 @@ public class GameThread implements Runnable {
                     }
                     currentMove = null;
                 } else {
-                    Thread.sleep(1000);
+                    Thread.sleep(1500);
 
                     showPlayerThinking(currentPlayer);
                     // wait to show ui
                     waitTillNextInput();
 
                     // player takes 4 secs to think
-                    Thread.sleep(1500);
+                    Thread.sleep(2000);
 
                     if (GameActivity.getTable().getAvailableMovesFor(currentPlayer).isEmpty()) {
+                        Log.d("__special__", "     : " + "reached empty");
+                        Log.d("__special__", "     : " + "cards : " + currentPlayer.getCards().toString());
                         GameActivity.getTable().incrementCurrentPlayerIndex();
 
                         // show that the player has passed this move
-                        activity.showPlayerPassed(currentPlayer);
+                        showPlayerPassed(currentPlayer);
                         // wait till UI refreshes
                         waitTillNextInput();
 
@@ -118,7 +120,7 @@ public class GameThread implements Runnable {
                     }
 
                     final Card ct = GameActivity.getTable().getAvailableMovesFor(currentPlayer).get(Solver.getIndexOfNextMove(GameActivity.getTable().getAvailableMovesFor(currentPlayer)));
-
+                    Log.d("__special__", "card played : " + ct.toString());
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -133,14 +135,19 @@ public class GameThread implements Runnable {
                         GameActivity.getTable().addNewCardToTable(ct);
                     }
 
+                    addNewCardToTable(ct);
+                    waitTillNextInput();
+
                     // show played move
-                    activity.showPlayedMove(currentPlayer, ct);
+                    showPlayedMove(currentPlayer, ct);
                     // wait for ui refresh
                     waitTillNextInput();
 
                     GameActivity.getTable().incrementCurrentPlayerIndex();
                     currentMove = null;
                 }
+
+                Log.d("__special__", "(P)move : " + currentPlayer.getName() + " cards : " + currentPlayer.getCards().toString());
 
                 // TODO : move this block to main game activity's on player won handler
                 // checks if any of the players has won
@@ -150,10 +157,9 @@ public class GameThread implements Runnable {
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(activity.getApplicationContext(), "Player won : " + currentPlayer.getName(), Toast.LENGTH_LONG).show();
+                            activity.getMainDisplayTextView().setText(Html.fromHtml("<font color=\"#00ff00\">Player won : " + currentPlayer.getName() + "</font>"));
                             PlayerView pv = activity.getViewForPlayer(currentPlayer);
                             if (pv == null) {
-                                Toast.makeText(activity.getApplicationContext(), "You won !!!", Toast.LENGTH_LONG).show();
                                 activity.emptyCallback();
                             } else {
                                 pv.setCurrentPlayer();
@@ -179,6 +185,10 @@ public class GameThread implements Runnable {
         }
     }
 
+    public void kill() {
+        thread.interrupt();
+    }
+
     void suspend() {
         suspended = true;
     }
@@ -202,8 +212,9 @@ public class GameThread implements Runnable {
         }
     }
 
-    public void showPlayerThinking(final Player currentPlayer) {
-        activity.runOnUiThread(new Runnable() {
+    private void showPlayerThinking(final Player currentPlayer) {
+        Handler refresh = new Handler(Looper.getMainLooper());
+        refresh.post(new Runnable() {
             @Override
             public void run() {
                 final PlayerView pv = activity.getViewForPlayer(currentPlayer);
@@ -221,6 +232,58 @@ public class GameThread implements Runnable {
                     activity.emptyCallback();
 
                 }
+            }
+        });
+    }
+
+
+    private void showPlayerPassed(final Player currentPlayer) {
+        Handler refresh = new Handler(Looper.getMainLooper());
+        refresh.post(new Runnable() {
+            @Override
+            public void run() {
+                String msg = currentPlayer.getName() + " passed current move ";
+                activity.getMainDisplayTextView().setText(msg);
+                PlayerView pv = activity.getViewForPlayer(currentPlayer);
+                if (pv != null) {
+                    pv.removeCurrentPlayer();
+                    activity.emptyCallback();
+                } else {
+                    msg = currentPlayer.getName() + " passed this move";
+                    activity.getMainDisplayTextView().setText(msg);
+                    activity.emptyCallback();
+                }
+            }
+        });
+    }
+
+    private void showPlayedMove(final Player currentPlayer, final Card ct) {
+        Handler refresh = new Handler(Looper.getMainLooper());
+        refresh.post(new Runnable() {
+            @Override
+            public void run() {
+                String msg = currentPlayer.getName() + " played " + ct.toString();
+                activity.getMainDisplayTextView().setText(msg);
+                PlayerView pv = activity.getViewForPlayer(currentPlayer);
+                if (pv != null) {
+                    pv.removeCurrentPlayer();
+                }
+                activity.emptyCallback();
+            }
+        });
+    }
+
+    private void addNewCardToTable(final Card ct) {
+        Handler refresh = new Handler(Looper.getMainLooper());
+        refresh.post(new Runnable() {
+            @Override
+            public void run() {
+                CardView cv = activity.getCardViewOnTableFor(ct);
+                if (cv != null) {
+                    cv.setCard(ct, true);
+                    cv.setVisibility(View.VISIBLE);
+                }
+                activity.emptyCallback();
             }
         });
     }

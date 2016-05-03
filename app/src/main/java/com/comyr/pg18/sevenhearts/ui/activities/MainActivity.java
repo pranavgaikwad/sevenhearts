@@ -22,7 +22,6 @@ public class MainActivity extends CustomActivity {
     private EditText playerNameEditText;
     private CircleButton startGameButton;
     private TextView mainLabelTextView;
-
     private MainActivity mainActivity;
 
     @Override

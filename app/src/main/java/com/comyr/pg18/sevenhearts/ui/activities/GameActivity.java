@@ -1,8 +1,6 @@
 package com.comyr.pg18.sevenhearts.ui.activities;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.SurfaceView;
@@ -279,7 +277,7 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
     }
 
     @Override
-    public void onPlayerSuitsRefreshed(Player p) {
+    public void onPlayerSuitsRefreshed(final Player p) {
         if (p.equals(thisPlayer)) {
             setupPlayerCards();
             Log.d(TAG, "recreated suits..");
@@ -292,25 +290,20 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
 
     @Override
     public void onOnAllPageSure(final Player p) {
-        if (thread != null)
-            if (!thread.isSuspended()) {
-                try {
-                    Handler refresh = new Handler(Looper.getMainLooper());
-                    refresh.post(new Runnable() {
-                        public void run() {
-                            PlayerView pv = getViewForPlayer(p);
-                            if (pv != null) {
-                                pv.setOnPageSureColor();
-                            }
-                            emptyCallback();
-                        }
-                    });
-                    // wait for ui to draw
-                    thread.waitTillNextInput();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+//        try {
+//            Handler refresh = new Handler(Looper.getMainLooper());
+//            refresh.post(new Runnable() {
+//                public void run() {
+//                    String msg = "<font color=\"#0000ff\">" + p.getName() + " is all page sure...</font>";
+//                    mainDisplayTextView.setText(Html.fromHtml(msg));
+//                    emptyCallback();
+//                }
+//            });
+//            // wait for ui to draw
+//            thread.waitTillNextInput();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
     }
 
     public void resumeThread() {
@@ -321,91 +314,36 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
 
     @Override
     public void onCardAddedToTable(Table t, final Card c) {
-        if (thread != null)
-            if (!thread.isSuspended()) {
-                try {
-                    Handler refresh = new Handler(Looper.getMainLooper());
-                    refresh.post(new Runnable() {
-                        public void run() {
-                            CardView cv = getCardViewOnTableFor(c);
-                            if (cv != null) {
-                                cv.setCard(c, true);
-                                cv.setVisibility(View.VISIBLE);
-                            }
-                            emptyCallback();
-                        }
-                    });
-
-                    // wait for ui to draw
-                    thread.waitTillNextInput();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-    }
-
-    public void showPlayerPassed(final Player currentPlayer) {
-        Handler refresh = new Handler(Looper.getMainLooper());
-        refresh.post(new Runnable() {
-            @Override
-            public void run() {
-                String msg = currentPlayer.getName() + " passed current move ";
-                getMainDisplayTextView().setText(msg);
-                PlayerView pv = getViewForPlayer(currentPlayer);
-                if (pv != null) {
-                    pv.removeCurrentPlayer();
-                    emptyCallback();
-                } else {
-                    msg = currentPlayer.getName() + " passed this move";
-                    getMainDisplayTextView().setText(msg);
-                    emptyCallback();
-                }
-            }
-        });
-    }
-
-//    public void showPlayerThinking(final Player currentPlayer) {
-//        runOnUiThread(new Runnable() {
-//            @Override
-//            public void run() {
-//                final PlayerView pv = getViewForPlayer(currentPlayer);
-//                if (pv != null) {
-//                    final String msg = currentPlayer.getName() + " is thinking";
-//                    Log.d(TAG, "check_" + msg);
-//                    getMainDisplayTextView().setText(Html.fromHtml(msg));
-//                    pv.setCurrentPlayer();
-//                    emptyCallback();
-//
-//                } else {
-//                    final String msg = "<font color=\"#ffff00\">Your move...</font>";
-//                    Log.d(TAG, "check_" + msg);
-//                    getMainDisplayTextView().setText(Html.fromHtml(msg));
-//                    emptyCallback();
-//
+//        if (thread != null)
+//            if (!thread.isSuspended()) {
+//                try {
+//                    Handler refresh = new Handler(Looper.getMainLooper());
+//                    refresh.post(new Runnable() {
+//                        public void run() {
+//                            CardView cv = getCardViewOnTableFor(c);
+//                            if (cv != null) {
+//                                cv.setCard(c, true);
+//                                cv.setVisibility(View.VISIBLE);
+//                            }
+//                            emptyCallback();
+//                        }
+//                    });
+//                    // wait for ui to draw
+//                    thread.waitTillNextInput();
+//                } catch (InterruptedException e) {
+//                    e.printStackTrace();
 //                }
 //            }
-//        });
-//    }
-
-    public void showPlayedMove(final Player currentPlayer, final Card ct) {
-        Handler refresh = new Handler(Looper.getMainLooper());
-        refresh.post(new Runnable() {
-            @Override
-            public void run() {
-                String msg = currentPlayer.getName() + " played " + ct.toString();
-                getMainDisplayTextView().setText(msg);
-                PlayerView pv = getViewForPlayer(currentPlayer);
-                if (pv != null) {
-                    pv.removeCurrentPlayer();
-                }
-                emptyCallback();
-            }
-        });
     }
+
+
+
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        thread.kill();
+        thread = null;
         finish();
     }
 
@@ -436,49 +374,6 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
 
     @Override
     public void onPlayerWon(Player p) {
-//        getViewForPlayer(p).setCurrentPlayer();
-//        Toast.makeText(this, "player won : " + p.getName(), Toast.LENGTH_LONG).show();
-//        Log.d(TAG, "on player won called for " + p.getName());
-//        thread.isFinished = true;
     }
 }
 
-/**
- * private void playGame() {
- * try {
- * Card currentMove;
- * while (!isFinished) {
- * currentPlayer = Table.getInstance().getCurrentPlayer();
- * currentPlayerView = getCurrentPlayerView();
- * if(currentPlayerView != null) currentPlayerView.setCurrentPlayer();
- * <p/>
- * if (currentPlayer.equals(thisPlayer)) {
- * if(table.getAvailableMovesFor(currentPlayer).isEmpty()) {
- * table.incrementCurrentPlayerIndex();
- * if(currentPlayerView != null) currentPlayerView.removeCurrentPlayer();
- * Log.d(TAG, "current player  : " + currentPlayer.getName());
- * continue;
- * } else {
- * isFinished = true;
- * }
- * } else {
- * Log.d(TAG, "player : " + currentPlayer.getName());
- * if (table.getAvailableMovesFor(currentPlayer).isEmpty()) {
- * table.incrementCurrentPlayerIndex();
- * continue;
- * }
- * <p/>
- * currentMove = table.getAvailableMovesFor(currentPlayer).get(Solver.getIndexOfNextMove(table.getAvailableMovesFor(currentPlayer)));
- * Card ct = currentPlayer.playCard(currentMove);
- * table.addNewCardToTable(currentMove);
- * <p/>
- * this.table.incrementCurrentPlayerIndex();
- * <p/>
- * if(currentPlayerView != null) currentPlayerView.removeCurrentPlayer();
- * }
- * }
- * } catch (NullTableException e) {
- * e.printStackTrace();
- * }
- * }
- **/

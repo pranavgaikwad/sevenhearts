@@ -5,17 +5,17 @@ import com.comyr.pg18.sevenhearts.game.resources.Player;
 import com.comyr.pg18.sevenhearts.game.resources.Table;
 
 public interface TableStateChangeListener {
-    public void onCardAddedToTable(Table t, Card c);
+    void onCardAddedToTable(Table t, Card c);
 
-    public void onCardRemovedFromTable(Table t, Card c);
+    void onCardRemovedFromTable(Table t, Card c);
 
-    public void onPlayerAddedToTable(Table t, Player p);
+    void onPlayerAddedToTable(Table t, Player p);
 
-    public void onPlayerRemovedFromTable(Table t, Player p);
+    void onPlayerRemovedFromTable(Table t, Player p);
 
-    public void onSuitsRefreshed(Table t);
+    void onSuitsRefreshed(Table t);
 
-    public void onTableFull(Table t);
+    void onTableFull(Table t);
 
-    public void onPlayerWon(Player p);
+    void onPlayerWon(Player p);
 }

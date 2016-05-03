@@ -103,8 +103,7 @@ public class Card {
      * @return true if equal, false otherwise
      */
     public boolean isSuitEqual(Card c) {
-        if (this.suit == c.getSuit()) return true;
-        return false;
+        return this.suit == c.getSuit();
     }
 
     /**
@@ -129,9 +128,7 @@ public class Card {
     public boolean equals(Object obj) {
         // TODO Auto-generated method stub
         Card c = (Card) obj;
-        if (this.id.equals(c.getId()))
-            return true;
-        return false;
+        return this.id.equals(c.getId());
     }
 
     @Override

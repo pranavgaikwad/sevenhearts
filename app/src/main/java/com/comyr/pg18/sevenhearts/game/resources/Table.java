@@ -249,8 +249,7 @@ public class Table {
      * @return true if full, false otherwise
      */
     public boolean isTableFull() {
-        if (cards.size() == 52) return true;
-        return false;
+        return cards.size() == 52;
     }
 
     /**
@@ -327,7 +326,6 @@ public class Table {
         String oc = "Available moves : " + "\n";
         if (Table.openCards == null) System.out.println("null opencards");
         for (Card c : Table.openCards) {
-            if (oc == null) System.out.println("oc null");
             if (c == null) System.out.println("c null");
             else oc = oc + c.toString() + "\n";
         }

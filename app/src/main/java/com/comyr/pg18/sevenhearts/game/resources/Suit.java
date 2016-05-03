@@ -148,7 +148,8 @@ public class Suit {
         Card h = getCardForRank(getHighestCardRank());
         Card l = getCardForRank(getLowestCardRank());
         if (isEmpty()) availableCards.add(new Card(Cards.SEVEN, this.getSuit()));
-        else if (h.getRank() == 12 && l.getRank() == 0) return;
+        else if (h.getRank() == 12 && l.getRank() == 0) {
+        }
         else if (h.getRank() == 12) availableCards.add(getCardForRank(l.getRank() - 1));
         else if (l.getRank() == 0) availableCards.add(getCardForRank(h.getRank() + 1));
         else {

@@ -33,7 +33,7 @@ public class Solver {
      *
      * @return index of the card to play
      */
-    public static int getIndexOfNextMove(ArrayList<Card> possibleCards) {
+    private static int getIndexOfNextMove(ArrayList<Card> possibleCards) {
         int i = -1;
         int minimumValue = INFINITY;
         for (Card c : possibleCards) {
@@ -44,6 +44,10 @@ public class Solver {
             }
         }
         return i;
+    }
+
+    public static Card getNextMove(ArrayList<Card> possibleCards) {
+        return possibleCards.get(getIndexOfNextMove(possibleCards));
     }
 
     private static int getTotalValueForSuit(Suit s) {

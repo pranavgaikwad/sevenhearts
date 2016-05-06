@@ -1,5 +1,7 @@
 package com.comyr.pg18.sevenhearts.game.resources;
 
+import android.util.Log;
+
 import com.comyr.pg18.sevenhearts.game.resources.constants.Cards;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
@@ -8,17 +10,21 @@ import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.NullTableExcep
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.PlayerNotFoundException;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Table {
     private static ArrayList<Card> openCards = new ArrayList<Card>();
     private static Table instance = null;
     private final ArrayList<Suit> localSuits = new ArrayList<Suit>();
+    // used for synchronization
+    private final Object lock = new Object();
+    private final String TAG = "Table";
+    private final String DEBUG_TAG = "__Table__";
     private Deck deck;
     private ArrayList<Player> players;
     private ArrayList<Card> cards;
     private int currentPlayerIndex;
     private TableStateChangeListener l;
-
     // following boolean value checks if any of the player has won or not
     // true if current player is first player to get removed from the table
     // a player is removed from the table as soon as he/she is out of cards.
@@ -41,8 +47,14 @@ public class Table {
         currentPlayerIndex = 0;
     }
 
+    // take care of all the static members while resetting
     public static void reset() {
-        instance = null;
+        if (instance != null) {
+            synchronized (instance) {
+                instance = null;
+            }
+            openCards = new ArrayList<>();
+        }
     }
 
     public static Table getInstance(TableStateChangeListener l, Player... players) {
@@ -57,6 +69,30 @@ public class Table {
         throw new NullTableException(Constants.MESSAGE_NULL_TABLE);
     }
 
+    /**
+     * returns possible available moves for given player
+     *
+     * @param p {@link Player} for whom moves are to be checked
+     * @return cards as an arraylist
+     */
+    public static ArrayList<Card> getAvailableMovesFor(Player p) {
+        ArrayList<Card> playerCards = p.getCards();
+        ArrayList<Card> availableCards = new ArrayList<Card>();
+        Iterator<Card> outer = playerCards.iterator();
+        while (outer.hasNext()) {
+            Card c1 = outer.next();
+            Iterator<Card> inner = Table.openCards.iterator();
+            while (inner.hasNext()) {
+                Card c2 = inner.next();
+                if (c1 != null)
+                    if (c2 != null)
+                        if (c1.equals(c2))
+                            availableCards.add(c1);
+            }
+        }
+        return availableCards;
+    }
+
     public ArrayList<Card> getCards() {
         return cards;
     }
@@ -65,8 +101,11 @@ public class Table {
      * passes move to the next player
      */
     public void incrementCurrentPlayerIndex() {
-        if (players.size() != 0)
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+        if (players.size() != 0) {
+            synchronized (lock) {
+                currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+            }
+        }
     }
 
     /**
@@ -96,28 +135,32 @@ public class Table {
      *
      */
     public void init() {
-        this.deck.shuffle();
+        deck.shuffle();
         updateTableStatus();
     }
 
     public void distributeCards() {
-        this.deck.distributeCardsToPlayers();
+        deck.distributeCardsToPlayers(this);
         try {
             Player p = whoHasSevenOfHearts();
-            if (p != null)
-                this.currentPlayerIndex = getPlayerIndex(p);
+            Log.d(TAG, "who has seven of hearts : " + p.getName());
+            if (p != null) {
+                synchronized (lock) {
+                    currentPlayerIndex = getPlayerIndex(p);
+                }
+            }
             else
                 throw new PlayerNotFoundException();
         } catch (PlayerNotFoundException e) {
-            e.printStackTrace();
+            Log.d(TAG, "caught player not found");
         }
     }
 
     public void removeAllCards() {
-        int i = cards.size() - 1;
-        for (Card c : cards) {
-            cards.remove(i);
-            i--;
+        Iterator<Card> it = cards.iterator();
+        while (it.hasNext()) {
+            Card c = it.next();
+            it.remove();
         }
         updateTableStatus();
     }
@@ -148,7 +191,9 @@ public class Table {
      * @param c card to add
      */
     public void addCardToTable(Card c) {
-        cards.add(c);
+        synchronized (cards) {
+            cards.add(c);
+        }
         l.onCardAddedToTable(this, c);
         updateTableStatus();
     }
@@ -174,7 +219,11 @@ public class Table {
      * @return true if valid, false otherwise
      */
     public boolean isMoveValid(Card c) {
-        for (Card c1 : Table.openCards) if (c.equals(c1)) return true;
+        Iterator<Card> it = Table.openCards.iterator();
+        while (it.hasNext()) {
+            Card c1 = it.next();
+            if (c.equals(c1)) return true;
+        }
         return false;
     }
 
@@ -183,10 +232,15 @@ public class Table {
      * cards according to suits
      */
     private void updateSuits() {
-        for (Card c : cards)
-            for (Suit s : localSuits) {
+        Iterator<Card> outer = cards.iterator();
+        while (outer.hasNext()) {
+            Card c = outer.next();
+            Iterator<Suit> inner = localSuits.iterator();
+            while (inner.hasNext()) {
+                Suit s = inner.next();
                 if (c.getSuit() == s.getSuit()) s.addNewCard(c);
             }
+        }
         l.onSuitsRefreshed(this);
     }
 
@@ -195,11 +249,16 @@ public class Table {
      */
     private void updateOpenCards() {
         Table.openCards = new ArrayList<Card>();
-        if (isEmpty())
-            Table.openCards.add(new Card(Cards.SEVEN, Suits.HEARTS));
+        if (isEmpty()) {
+            synchronized (openCards) {
+                openCards.add(new Card(Cards.SEVEN, Suits.HEARTS));
+            }
+        }
         else {
-            for (Suit s : localSuits) {
-                Table.openCards.addAll(s.availableCards);
+            Iterator<Suit> it = localSuits.iterator();
+            while (it.hasNext()) {
+                Suit s = it.next();
+                openCards.addAll(s.availableCards);
             }
         }
     }
@@ -277,33 +336,7 @@ public class Table {
      * @return true if no cards, false otherwise
      */
     public boolean isEmpty() {
-        return this.cards.isEmpty();
-    }
-
-    /**
-     * wrapper for getting available moves for current player
-     *
-     * @return
-     */
-    public ArrayList<Card> getAvailableMovesForCurrentPlayer() {
-        Player p = this.players.get(currentPlayerIndex);
-        return getAvailableMovesFor(p);
-    }
-
-    /**
-     * returns possible available moves for given player
-     *
-     * @param p {@link Player} for whom moves are to be checked
-     * @return cards as an arraylist
-     */
-    public ArrayList<Card> getAvailableMovesFor(Player p) {
-        ArrayList<Card> playerCards = p.getCards();
-        ArrayList<Card> availableCards = new ArrayList<Card>();
-        for (Card c1 : playerCards) {
-            for (Card c2 : Table.openCards)
-                if ((c2 != null) && c1.equals(c2)) availableCards.add(c1);
-        }
-        return availableCards;
+        return cards.isEmpty();
     }
 
     /**
@@ -312,7 +345,11 @@ public class Table {
      * @return player {@link Player} with seven of hearts
      */
     public Player whoHasSevenOfHearts() {
-        for (Player p : this.players) if (p.hasCard(new Card(Cards.SEVEN, Suits.HEARTS))) return p;
+        Iterator<Player> it = players.iterator();
+        while (it.hasNext()) {
+            Player p = it.next();
+            if (p.hasCard(new Card(Cards.SEVEN, Suits.HEARTS))) return p;
+        }
         return null;
     }
 
@@ -324,7 +361,6 @@ public class Table {
      */
     public String getOpenCardsAsString() {
         String oc = "Available moves : " + "\n";
-        if (Table.openCards == null) System.out.println("null opencards");
         for (Card c : Table.openCards) {
             if (c == null) System.out.println("c null");
             else oc = oc + c.toString() + "\n";
@@ -341,8 +377,10 @@ public class Table {
      */
     public int getPlayerIndex(Player p) throws PlayerNotFoundException {
         int i = 0;
-        for (Player pl : players) {
-            if (pl.equals(p)) return i;
+        Iterator<Player> it = players.iterator();
+        while (it.hasNext()) {
+            Player p1 = it.next();
+            if (p1.equals(p)) return i;
             i++;
         }
         throw new PlayerNotFoundException(Constants.MESSAGE_PLAYER_NOT_FOUND);

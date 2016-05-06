@@ -37,10 +37,11 @@ public class Game implements TableStateChangeListener, PlayerStateChangeListener
             players[i] = new Player(name, this);
             i++;
         }
-        this.table = Table.getInstance(this, players);
-        this.table.init();
-        this.deck = this.table.getDeck();
+        table = new Table(this, players);
+        table.init();
+        deck = this.table.getDeck();
         init(players);
+        table.distributeCards();
     }
 
     /**
@@ -81,7 +82,7 @@ public class Game implements TableStateChangeListener, PlayerStateChangeListener
                 table.incrementCurrentPlayerIndex();
                 continue;
             } else {
-                c = table.getAvailableMovesFor(p).get(Solver.getIndexOfNextMove(table.getAvailableMovesFor(p)));
+                c = Solver.getNextMove(table.getAvailableMovesFor(p));
             }
             if (c == null) {
                 System.out.println("null card");

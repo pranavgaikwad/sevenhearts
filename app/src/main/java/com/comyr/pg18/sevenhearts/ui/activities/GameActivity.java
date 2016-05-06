@@ -3,12 +3,14 @@ package com.comyr.pg18.sevenhearts.ui.activities;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
-import android.view.SurfaceView;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.comyr.pg18.sevenhearts.R;
+import com.comyr.pg18.sevenhearts.background.tasks.GameInitTask;
+import com.comyr.pg18.sevenhearts.background.tasks.GameTask;
+import com.comyr.pg18.sevenhearts.background.threads.GameThread;
 import com.comyr.pg18.sevenhearts.game.resources.Card;
 import com.comyr.pg18.sevenhearts.game.resources.Deck;
 import com.comyr.pg18.sevenhearts.game.resources.Player;
@@ -16,10 +18,8 @@ import com.comyr.pg18.sevenhearts.game.resources.Table;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
 import com.comyr.pg18.sevenhearts.game.resources.utils.PlayerStateChangeListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.TableStateChangeListener;
-import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.NullTableException;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.PlayerNotFoundException;
 import com.comyr.pg18.sevenhearts.ui.activities.base.CustomActivity;
-import com.comyr.pg18.sevenhearts.ui.threads.GameThread;
 import com.comyr.pg18.sevenhearts.ui.utils.FontUtils;
 import com.comyr.pg18.sevenhearts.ui.utils.GameData;
 import com.comyr.pg18.sevenhearts.ui.utils.helper.ActivityOptionHelper;
@@ -27,87 +27,128 @@ import com.comyr.pg18.sevenhearts.ui.views.CardView;
 import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class GameActivity extends CustomActivity implements PlayerStateChangeListener, TableStateChangeListener {
 
-    // decides which player's information to display
-    private final static String thisPlayerName = GameData.thisPlayerName;
-    private static ArrayList<Player> players;
-    private static Table table;
-    private static Deck deck;
-    private static Player thisPlayer;
-    private static ArrayList<Card> thisPlayerCards;
-    // player with current turn on the table
-    private static Player currentPlayer;
+    private static final Object threadLock = new Object();
+    private static GameThread thread;
     private final String TAG = "GameActivity";
+    private ArrayList<Player> players;
+    private Table table;
+    private Deck deck;
+    private Player thisPlayer;
+    private ArrayList<Card> thisPlayerCards;
+    // player with current turn on the table
+    private Player currentPlayer;
     private LinearLayout playerCardsLayout;
     private LinearLayout playersLayout;
     private TextView mainDisplayTextView;
     private GameActivity gameActivity;
-    // terminating condition for main game loop
-    private boolean isFinished = false;
-    private PlayerView currentPlayerView;
     // table variables
     private CardView heartsUpperCard, heartsLowerCard, diamondsUpperCard, diamondsLowerCard, spadesUpperCard, spadesLowerCard, clubsUpperCard, clubsLowerCard;
+    private GameInitTask gameInitTask;
+    private GameTask task;
 
-    private GameThread thread;
+    public static GameThread getThread() {
+        return thread;
+    }
 
-    public static Player getThisPlayer() {
+    public static void setThread(GameThread thread) {
+        synchronized (threadLock) {
+            GameActivity.thread = thread;
+        }
+    }
+
+    public static void resumeThread() {
+        if (thread != null)
+            if (thread.isSuspended())
+                thread.resume();
+    }
+
+    public Player getThisPlayer() {
         return thisPlayer;
     }
 
-    public static Deck getDeck() {
+    public void setThisPlayer(Player tp) {
+        thisPlayer = tp;
+    }
+
+    public Deck getDeck() {
         return deck;
     }
 
-    public static ArrayList<Card> getThisPlayerCards() {
+    public void setDeck(Deck d) {
+        deck = d;
+    }
+
+    public ArrayList<Card> getThisPlayerCards() {
         return thisPlayerCards;
     }
 
-    public static Table getTable() {
+    public void setThisPlayerCards(ArrayList<Card> tpc) {
+        thisPlayerCards = tpc;
+    }
+
+    public Table getTable() {
         return table;
     }
 
-    public static ArrayList<Player> getPlayers() {
+    public void setTable(Table t) {
+        table = t;
+    }
+
+    public ArrayList<Player> getPlayers() {
         return players;
+    }
+
+    public void setPlayers(ArrayList<Player> ps) {
+        players = ps;
+    }
+
+    public LinearLayout getPlayersLayout() {
+        return playersLayout;
+    }
+
+    public LinearLayout getPlayerCardsLayout() {
+        return playerCardsLayout;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.setOptions(ActivityOptionHelper.getOptionsForActivity(ActivityOptionHelper.ACTIVITY_GAME));
+
         setContentView(R.layout.activity_game);
+
+        reset();
 
         gameActivity = this;
 
         initUI();
 
-        initGameResources();
+        gameInitTask = new GameInitTask(gameActivity);
+        gameInitTask.execute();
+    }
 
-        //playGame();
-
-        testThread();
+    private void testTask() {
+        task = new GameTask(gameActivity);
+        task.execute();
     }
 
     public TextView getMainDisplayTextView() {
         return mainDisplayTextView;
     }
 
-    private void testThread() {
+    public void testThread() {
         thread = new GameThread(gameActivity);
         thread.start();
-    }
-
-    private PlayerView getCurrentPlayerView() {
-        SurfaceView sv = new SurfaceView(this);
-        return getViewForPlayer(currentPlayer);
     }
 
     public PlayerView getViewForPlayer(Player player) {
         for (int i = 0; i < playersLayout.getChildCount(); i++) {
             PlayerView pv = (PlayerView) playersLayout.getChildAt(i);
             if (pv.getPlayer().equals(player)) {
-                Log.d(TAG, "comparing..." + pv.getPlayer().toString() + " with " + player);
                 return pv;
             }
         }
@@ -124,15 +165,22 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
 
     public void emptyCallback() {
         resumeThread();
+//        resumeTask();
+    }
+
+    public void resumeTask() {
+        if (task != null)
+            task.resumeExecution();
     }
 
     private void initTable() {
-        Table.reset();
-        String player2, player3, player4;
-        player2 = GameData.getRandomPlayerName();
-        player3 = GameData.getRandomPlayerName();
-        player4 = GameData.getRandomPlayerName();
-        String[] names = {thisPlayerName, player2, player3, player4};
+        Log.d("table status", "Initing table");
+        table = null;
+        GameData.initData();
+        String p2 = GameData.getRandomPlayerName();
+        String p3 = GameData.getRandomPlayerName();
+        String p4 = GameData.getRandomPlayerName();
+        String[] names = {GameData.thisPlayerName, p2, p3, p4};
         Player[] players = new Player[names.length];
         int i = 0;
         for (String name : names) {
@@ -144,8 +192,10 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
         deck = table.getDeck();
     }
 
-    private Player getPlayerForName(String name) throws PlayerNotFoundException {
-        for (Player p : players) {
+    public Player getPlayerForName(String name) throws PlayerNotFoundException {
+        Iterator<Player> it = players.iterator();
+        while (it.hasNext()) {
+            Player p = it.next();
             if (p.getName().equals(name)) return p;
         }
         throw new PlayerNotFoundException("In game activity, while getting this player");
@@ -153,8 +203,8 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
 
     private void setupPlayers() {
         try {
-            players = Table.getInstance().getPlayers();
-            thisPlayer = getPlayerForName(thisPlayerName);
+            players = table.getPlayers();
+            thisPlayer = getPlayerForName(GameData.thisPlayerName);
             table.distributeCards();
             for (Player p : players) {
                 if (!p.equals(thisPlayer)) {
@@ -163,25 +213,20 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
                     playersLayout.addView(playerView);
                 }
             }
-        } catch (NullTableException e) {
-            Log.d(TAG, e.getMessage());
+//        } catch (NullTableException e) {
         } catch (PlayerNotFoundException e) {
-            Log.d(TAG, e.getMessage());
+
         }
     }
 
     private void setupPlayerCards() {
-
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 playerCardsLayout.removeAllViews();
             }
         });
-
-        // Log.d(TAG, "removed views");
         thisPlayerCards = thisPlayer.getCards();
-        Log.d(TAG, thisPlayerCards.toString());
         int i = 0;
         for (Card c : thisPlayerCards) {
             final CardView cv = new CardView(this);
@@ -190,11 +235,10 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
                 @Override
                 public void onClick(View v) {
                     Card clickedCard = ((CardView) v).getCard();
-
-                    if (!table.isMoveValid(clickedCard)) return;
-
-                    thread.currentMove = ((CardView) v).getCard();
-                    thread.resume();
+                    boolean valid = table.isMoveValid(clickedCard);
+                    if (!valid) return;
+                    thread.setCurrentMove(clickedCard);
+                    emptyCallback();
                 }
             });
             if (i != 0)
@@ -267,84 +311,62 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
 
     @Override
     public void onPlayerCardsExhausted(Player p) {
-        this.table.removePlayerFromTable(p);
-        if (p.equals(thisPlayer)) Log.d(TAG, "player removed...");
+        synchronized (table) {
+            table.removePlayerFromTable(p);
+        }
     }
 
     @Override
     public void onPlayerCardsExhausted(Player p, String status) {
-        this.table.removePlayerFromTable(p);
+        synchronized (table) {
+            table.removePlayerFromTable(p);
+        }
     }
 
     @Override
     public void onPlayerSuitsRefreshed(final Player p) {
         if (p.equals(thisPlayer)) {
             setupPlayerCards();
-            Log.d(TAG, "recreated suits..");
+            emptyCallback();
         } else {
             PlayerView pv = getViewForPlayer(p);
             if (pv != null) pv.updateNameWithCount();
+            emptyCallback();
         }
-        resumeThread();
+
     }
 
     @Override
     public void onOnAllPageSure(final Player p) {
-//        try {
-//            Handler refresh = new Handler(Looper.getMainLooper());
-//            refresh.post(new Runnable() {
-//                public void run() {
-//                    String msg = "<font color=\"#0000ff\">" + p.getName() + " is all page sure...</font>";
-//                    mainDisplayTextView.setText(Html.fromHtml(msg));
-//                    emptyCallback();
-//                }
-//            });
-//            // wait for ui to draw
-//            thread.waitTillNextInput();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-    }
 
-    public void resumeThread() {
-        if (thread != null)
-            if (thread.isSuspended())
-                thread.resume();
     }
 
     @Override
     public void onCardAddedToTable(Table t, final Card c) {
-//        if (thread != null)
-//            if (!thread.isSuspended()) {
-//                try {
-//                    Handler refresh = new Handler(Looper.getMainLooper());
-//                    refresh.post(new Runnable() {
-//                        public void run() {
-//                            CardView cv = getCardViewOnTableFor(c);
-//                            if (cv != null) {
-//                                cv.setCard(c, true);
-//                                cv.setVisibility(View.VISIBLE);
-//                            }
-//                            emptyCallback();
-//                        }
-//                    });
-//                    // wait for ui to draw
-//                    thread.waitTillNextInput();
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
+
     }
-
-
-
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         thread.kill();
-        thread = null;
+        reset();
         finish();
+    }
+
+    private void reset() {
+        gameInitTask = null;
+        players = null;
+        Table.reset();
+        table = null;
+        deck = null;
+        thisPlayer = null;
+        thisPlayerCards = null;
+        currentPlayer = null;
+        gameActivity = null;
+        //task.cancel(true);
+        //task = null;
+        thread = null;
     }
 
     @Override

@@ -113,9 +113,10 @@ public class Suit {
      * @return true if empty, false otherwise
      */
     public boolean isEmpty() {
-        for (Card c : cards) {
-            if (c != null)
-                return false;
+        Iterator<Card> it = cards.iterator();
+        while (it.hasNext()) {
+            Card c = it.next();
+            if (c != null) return false;
         }
         return true;
     }
@@ -127,7 +128,9 @@ public class Suit {
      */
     public void insertNewCard(Card c) {
         if (!contains(c)) {
-            cards.add(c);
+            synchronized (cards) {
+                cards.add(c);
+            }
         }
         updateAvailableCards();
     }
@@ -135,7 +138,7 @@ public class Suit {
     public void removeAllCards() {
         Iterator<Card> iter = cards.iterator();
         while (iter.hasNext()) {
-            Card card = iter.next();
+            Card c = iter.next();
             iter.remove();
         }
     }
@@ -166,7 +169,9 @@ public class Suit {
     public int getLowestCardRank() {
         if (cards.isEmpty()) return SUIT_EMPTY;
         Card lowest = cards.get(0);
-        for (Card c : cards) {
+        Iterator<Card> it = cards.iterator();
+        while (it.hasNext()) {
+            Card c = it.next();
             if (c.compareCardRankWith(lowest) == Constants.STATUS_LOWER) lowest = c;
         }
         return lowest.getRank();
@@ -180,7 +185,9 @@ public class Suit {
     public int getHighestCardRank() {
         if (cards.isEmpty()) return SUIT_EMPTY;
         Card highest = cards.get(0);
-        for (Card c : cards) {
+        Iterator<Card> it = cards.iterator();
+        while (it.hasNext()) {
+            Card c = it.next();
             if (c.compareCardRankWith(highest) == Constants.STATUS_GREATER) highest = c;
         }
         return highest.getRank();
@@ -232,7 +239,12 @@ public class Suit {
      * @return true if contains, false otherwise
      */
     public boolean contains(Card card) {
-        for (Card c : cards) if (card.equals(c)) return true;
+        Iterator<Card> it = cards.iterator();
+        while (it.hasNext()) {
+            Card c = it.next();
+            if (card.equals(c))
+                return true;
+        }
         return false;
     }
 

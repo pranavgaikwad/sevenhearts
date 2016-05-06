@@ -7,7 +7,6 @@ import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
 import com.comyr.pg18.sevenhearts.game.resources.utils.PlayerStateChangeListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.CardNotFoundException;
-import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.NullTableException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -77,11 +76,7 @@ public class Player {
     }
 
     public boolean isAllPageSure() {
-        try {
-            return equalLists(cards, Table.getInstance().getAvailableMovesFor(this));
-        } catch (NullTableException e) {
-            return false;
-        }
+        return equalLists(cards, Table.getAvailableMovesFor(this));
     }
 
     private boolean equalLists(List<Card> one, List<Card> two) {
@@ -121,19 +116,35 @@ public class Player {
      * @param l state change listener {@link PlayerStateChangeListener}
      */
     private void updateSuits(PlayerStateChangeListener l) {
-        for (Suit s : localSuits) {
+        Iterator<Suit> suitIterator = localSuits.iterator();
+        while (suitIterator.hasNext()) {
+            Suit s = suitIterator.next();
             s.removeAllCards();
         }
-        for (Card c : cards)
-            for (Suit s : localSuits) {
+
+        Iterator<Card> outer = cards.iterator();
+        while (outer.hasNext()) {
+            Iterator<Suit> inner = localSuits.iterator();
+            Card c = outer.next();
+            while (inner.hasNext()) {
+                Suit s = inner.next();
                 if (c.getSuit() == s.getSuit()) s.addNewCard(c);
             }
+        }
+
         cards = new ArrayList<>();
-        for (Suit s : localSuits) {
+
+        suitIterator = localSuits.iterator();
+        while (suitIterator.hasNext()) {
+            Suit s = suitIterator.next();
             s.sort();
             cards.addAll(s.getCards());
         }
         l.onPlayerSuitsRefreshed(this);
+    }
+
+    public void untakeMove(Card ct) {
+        giveCard(ct);
     }
 
     public String getName() {
@@ -156,15 +167,16 @@ public class Player {
      * @param c card
      */
     public void giveCard(Card c) {
-        cards.add(c);
-        if (areCardsExhausted()) l.onPlayerCardsExhausted(this);
+        synchronized (cards) {
+            cards.add(c);
+        }
         updatePlayerState();
     }
 
     private void updatePlayerState() {
         updateScore();
         updateSuits(l);
-        checkAllPageSure();
+        // checkAllPageSure();
     }
 
     private void checkAllPageSure() {
@@ -209,8 +221,9 @@ public class Player {
     }
 
     public void removeAllCards() {
-        Iterator it = cards.iterator();
+        Iterator<Card> it = cards.iterator();
         while (it.hasNext()) {
+            Card c = it.next();
             it.remove();
         }
         updateSuits(l);
@@ -236,8 +249,10 @@ public class Player {
      */
     public int getIndexCard(Card c) throws CardNotFoundException {
         int i = 0;
-        for (Card crd : cards) {
-            if (c.equals(crd)) return i;
+        Iterator<Card> it = cards.iterator();
+        while (it.hasNext()) {
+            Card crd = it.next();
+            if (crd.equals(c)) return i;
             i++;
         }
         throw new CardNotFoundException(Constants.MESSAGE_CARD_NOT_FOUND);
@@ -259,7 +274,12 @@ public class Player {
      * @return true if has, false otherwise
      */
     public boolean hasCard(Card c) {
-        for (Card c1 : this.cards) if (c.equals(c1)) return true;
+        Iterator<Card> it = cards.iterator();
+        while (it.hasNext()) {
+            Card playerCard = it.next();
+            if (playerCard.equals(c))
+                return true;
+        }
         return false;
     }
 

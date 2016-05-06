@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Build;
 import android.text.Html;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -18,7 +17,9 @@ import com.comyr.pg18.sevenhearts.ui.utils.CustomResolution;
 import com.comyr.pg18.sevenhearts.ui.utils.FontUtils;
 import com.comyr.pg18.sevenhearts.ui.utils.helper.ResolutionHelper;
 
+import java.util.Collections;
 import java.util.Random;
+import java.util.Stack;
 
 /**
  * Created by pranav on 5/1/16.
@@ -73,40 +74,15 @@ public class PlayerView extends LinearLayout {
 
     }
 
+
     private int getRandomUserImage() {
-        Random r = new Random();
-        int i = new Random(System.nanoTime()).nextInt(999999);
-        i = i % 9;
-        Log.d(TAG, String.valueOf(i));
-        switch (i) {
-            case 0:
-                return R.drawable.ic_player_b_golfer;
-
-            case 1:
-                return R.drawable.ic_player_detective;
-
-            case 2:
-                return R.drawable.ic_player_golfer;
-
-            case 3:
-                return R.drawable.ic_player_mature;
-
-            case 4:
-                return R.drawable.ic_player_motor;
-
-            case 5:
-                return R.drawable.ic_player_swat;
-
-            case 6:
-                return R.drawable.ic_player_tennis;
-
-            case 7:
-                return R.drawable.ic_player_thief;
-
-            case 8:
-                return R.drawable.ic_player_young;
+        Stack<Integer> drawables = new Stack<>();
+        int[] ids = {R.drawable.ic_player_young, R.drawable.ic_player_young, R.drawable.ic_player_thief, R.drawable.ic_player_tennis, R.drawable.ic_player_swat, R.drawable.ic_player_motor, R.drawable.ic_player_mature, R.drawable.ic_player_b_golfer, R.drawable.ic_player_detective, R.drawable.ic_player_golfer};
+        for (int id : ids) {
+            drawables.push(id);
         }
-        return R.drawable.ic_player_young;
+        Collections.shuffle(drawables, new Random(System.nanoTime()));
+        return drawables.pop();
     }
 
     public Player getPlayer() {

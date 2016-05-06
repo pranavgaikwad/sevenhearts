@@ -128,7 +128,7 @@ public class Card {
     public boolean equals(Object obj) {
         // TODO Auto-generated method stub
         Card c = (Card) obj;
-        return this.id.equals(c.getId());
+        return id.equals(c.getId());
     }
 
     @Override

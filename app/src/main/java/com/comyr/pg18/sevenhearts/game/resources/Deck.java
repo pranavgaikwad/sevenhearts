@@ -1,10 +1,10 @@
 package com.comyr.pg18.sevenhearts.game.resources;
 
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
-import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.NullTableException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Random;
 import java.util.Stack;
 
@@ -49,7 +49,9 @@ public class Deck {
      * @param s suit
      */
     private void addSuitToDeck(Suit s) {
-        for (Card c : s.getCards()) {
+        Iterator<Card> it = s.getCards().iterator();
+        while (it.hasNext()) {
+            Card c = it.next();
             addNewCard(c);
         }
     }
@@ -60,7 +62,9 @@ public class Deck {
      * @param c card
      */
     private void addNewCard(Card c) {
-        cards.push(c);
+        synchronized (cards) {
+            cards.push(c);
+        }
     }
 
     /**
@@ -89,20 +93,22 @@ public class Deck {
     /**
      * distributes all available cards to players
      */
-    public void distributeCardsToPlayers() {
+    public void distributeCardsToPlayers(Table t) {
         int i = 0, temp;
         ArrayList<Player> players;
-        try {
-            players = Table.getInstance().getPlayers();
-            while (!isEmpty()) {
-                temp = i % players.size();
+//        try {
+        players = t.getPlayers();
+        while (!isEmpty()) {
+            temp = i % players.size();
+            synchronized (cards) {
                 players.get(temp).giveCard(cards.pop());
-                i++;
             }
-        } catch (NullTableException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            i++;
         }
+//        } catch (NullTableException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
     }
 
     /**
@@ -110,20 +116,20 @@ public class Deck {
      * re-shuffles the deck
      * gets ready for a new game
      */
-    public void collectCardsFromTable() {
+    public void collectCardsFromTable(Table t) {
         int i = 0, temp;
-        try {
-            for (Player p : Table.getInstance().getPlayers()) {
-                cards.addAll(p.getCards());
-                p.removeAllCards();
-            }
-            cards.addAll(Table.getInstance().getCards());
-            Table.getInstance().removeAllCards();
-            this.shuffle();
-        } catch (NullTableException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+//        try {
+        for (Player p : t.getPlayers()) {
+            cards.addAll(p.getCards());
+            p.removeAllCards();
         }
+        cards.addAll(t.getCards());
+        t.removeAllCards();
+        shuffle();
+//        } catch (NullTableException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
     }
 
     @Override

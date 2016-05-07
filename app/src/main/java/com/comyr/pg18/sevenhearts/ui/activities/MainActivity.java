@@ -32,6 +32,7 @@ public class MainActivity extends CustomActivity {
         super.setOptions(ActivityOptionHelper.getOptionsForActivity(ActivityOptionHelper.ACTIVITY_MAIN));
         setContentView(R.layout.activity_main);
 
+
         mAnalytics.trackAction(MixPanel.ACTION_ACTIVITY_OPEN, MixPanel.TAG_ACTIVITY, TAG);
 
         mainActivity = this;

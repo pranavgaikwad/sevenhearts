@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">Seven Hearts</string>
+    <string name="app_name">Badam Satti</string>
+    <string name="crash_toast_text">Report crash</string>
 </resources>

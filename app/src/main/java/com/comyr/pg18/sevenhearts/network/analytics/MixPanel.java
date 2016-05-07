@@ -16,8 +16,10 @@ public class MixPanel {
     public static final String ACTION_ACTIVITY_OPEN = "Activity Open";
     public static final String ACTION_BACK_PRESSED = "Back Press";
     public static final String ACTION_PLAYER_WON = "Won";
+    public static final String ACTION_CRASH = "Crash";
     public static final String TAG_ACTIVITY = "Activity";
     public static final String TAG_PLAYER = "Player";
+    public static final String TAG_CAUSE = "Cause";
     private static MixPanel instance = null;
     private final String PROJECT_TOKEN = "1fbc375b41f87af3dd14780f059a862a";
     private Context context;

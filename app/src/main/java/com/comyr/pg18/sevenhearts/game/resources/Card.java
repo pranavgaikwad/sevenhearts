@@ -1,13 +1,6 @@
 package com.comyr.pg18.sevenhearts.game.resources;
 
-import android.annotation.TargetApi;
-import android.os.Build;
-
 import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 public class Card {
     private String id;        // used to match cards
@@ -55,32 +48,15 @@ public class Card {
      * initiates the card
      * TODO : check target api
      */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     private void initCardInfo() {
         this.rankName = Constants.CARDS[this.rank];
         this.suitName = Constants.SUITS[this.suit];
-        this.id = new String(getMD5(rankName + suitName), StandardCharsets.UTF_8);
+        this.id = rankName + suitName;
         this.identifier = rank + (10 * suit);
     }
 
     public int getIdentifier() {
         return identifier;
-    }
-
-    /**
-     * gets md5 for given string
-     *
-     * @param s string
-     * @return
-     */
-    private byte[] getMD5(String s) {
-        byte[] str = s.getBytes();
-        try {
-            MessageDigest d = MessageDigest.getInstance("MD5");
-            return d.digest(str);
-        } catch (NoSuchAlgorithmException e) {
-            return str;
-        }
     }
 
     /**

@@ -9,6 +9,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.comyr.pg18.sevenhearts.R;
+import com.comyr.pg18.sevenhearts.network.analytics.MixPanel;
 import com.comyr.pg18.sevenhearts.ui.activities.base.CustomActivity;
 import com.comyr.pg18.sevenhearts.ui.utils.FontUtils;
 import com.comyr.pg18.sevenhearts.ui.utils.GameData;
@@ -17,6 +18,7 @@ import com.comyr.pg18.sevenhearts.ui.utils.helper.ActivityOptionHelper;
 import at.markushi.ui.CircleButton;
 
 public class MainActivity extends CustomActivity {
+    private final String TAG = "MainActivity";
 
     private Button playerNameButton;
     private EditText playerNameEditText;
@@ -29,6 +31,8 @@ public class MainActivity extends CustomActivity {
         super.onCreate(savedInstanceState);
         super.setOptions(ActivityOptionHelper.getOptionsForActivity(ActivityOptionHelper.ACTIVITY_MAIN));
         setContentView(R.layout.activity_main);
+
+        mAnalytics.trackAction(MixPanel.ACTION_ACTIVITY_OPEN, MixPanel.TAG_ACTIVITY, TAG);
 
         mainActivity = this;
 

@@ -1,16 +1,10 @@
 package com.comyr.pg18.sevenhearts.game.resources;
 
-import android.annotation.TargetApi;
-import android.os.Build;
-
 import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
 import com.comyr.pg18.sevenhearts.game.resources.utils.PlayerStateChangeListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.CardNotFoundException;
 
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -37,11 +31,10 @@ public class Player {
      * @param name player name
      * @param l    keeps updated with current player state {@link PlayerStateChangeListener}
      */
-    @TargetApi(Build.VERSION_CODES.KITKAT)
     public Player(String name, PlayerStateChangeListener l) {
         this.name = name;
         this.l = l;
-        this.id = new String(getMD5(name), StandardCharsets.UTF_8);
+        this.id = name;
         init();
     }
 
@@ -183,21 +176,6 @@ public class Player {
         if (isAllPageSure()) l.onOnAllPageSure(this);
     }
 
-    /**
-     * gets md5 for given string
-     *
-     * @param s string
-     * @return
-     */
-    private byte[] getMD5(String s) {
-        byte[] str = s.getBytes();
-        try {
-            MessageDigest d = MessageDigest.getInstance("MD5");
-            return d.digest(str);
-        } catch (NoSuchAlgorithmException e) {
-            return str;
-        }
-    }
 
     /**
      * plays given card

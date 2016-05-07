@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 
+import com.comyr.pg18.sevenhearts.network.analytics.MixPanel;
 import com.comyr.pg18.sevenhearts.ui.utils.CustomActivityOptions;
 
 /**
@@ -15,8 +16,8 @@ import com.comyr.pg18.sevenhearts.ui.utils.CustomActivityOptions;
  * This activity is LANDSCAPE ONLY
  */
 public class CustomActivity extends AppCompatActivity {
-
     private final String TAG = "CustomActivity";
+    protected MixPanel mAnalytics;
 
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
@@ -28,6 +29,7 @@ public class CustomActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         // Hide status bar
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        mAnalytics = MixPanel.getInstance(this);
     }
 
     protected void setOptions(CustomActivityOptions options) {
@@ -46,5 +48,15 @@ public class CustomActivity extends AppCompatActivity {
 
     protected void initUI() {
 
+    }
+
+    public MixPanel getmAnalytics() {
+        return mAnalytics;
+    }
+
+    @Override
+    protected void onDestroy() {
+        mAnalytics.flush();
+        super.onDestroy();
     }
 }

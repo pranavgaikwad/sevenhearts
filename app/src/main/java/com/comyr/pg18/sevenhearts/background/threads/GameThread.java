@@ -7,6 +7,7 @@ import com.comyr.pg18.sevenhearts.game.resources.Card;
 import com.comyr.pg18.sevenhearts.game.resources.Player;
 import com.comyr.pg18.sevenhearts.game.resources.Table;
 import com.comyr.pg18.sevenhearts.game.solution.Solver;
+import com.comyr.pg18.sevenhearts.network.analytics.MixPanel;
 import com.comyr.pg18.sevenhearts.ui.activities.GameActivity;
 import com.comyr.pg18.sevenhearts.ui.views.CardView;
 import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
@@ -19,7 +20,6 @@ public class GameThread implements Runnable {
     private static final Object lock = new Object();
     public static boolean isFinished = false;
     public static Player currentPlayer;
-    private final String TAG = "TestThread";
     private final Object moveLock = new Object();
     private Card currentMove;
     private Thread thread;
@@ -34,10 +34,6 @@ public class GameThread implements Runnable {
 
     public String getName() {
         return name;
-    }
-
-    public Thread getThread() {
-        return thread;
     }
 
     public void setCurrentMove(Card c) {
@@ -151,6 +147,7 @@ public class GameThread implements Runnable {
                 // TODO : move this block to main game activity's on player won handler
                 // checks if any of the players has won
                 if (currentPlayer.getCards().isEmpty()) {
+                    activity.getmAnalytics().trackAction(MixPanel.ACTION_PLAYER_WON, MixPanel.TAG_PLAYER, currentPlayer.getName());
                     isFinished = true;
                     activity.runOnUiThread(new Runnable() {
                         @Override

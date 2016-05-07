@@ -13,6 +13,7 @@ import com.comyr.pg18.sevenhearts.game.resources.Player;
 import com.comyr.pg18.sevenhearts.game.resources.Table;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.PlayerNotFoundException;
+import com.comyr.pg18.sevenhearts.network.analytics.MixPanel;
 import com.comyr.pg18.sevenhearts.ui.activities.base.CustomActivity;
 import com.comyr.pg18.sevenhearts.ui.utils.FontUtils;
 import com.comyr.pg18.sevenhearts.ui.utils.helper.ActivityOptionHelper;
@@ -97,8 +98,9 @@ public class GameActivity extends CustomActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.setOptions(ActivityOptionHelper.getOptionsForActivity(ActivityOptionHelper.ACTIVITY_GAME));
-
         setContentView(R.layout.activity_game);
+
+        mAnalytics.trackAction(MixPanel.ACTION_ACTIVITY_OPEN, MixPanel.TAG_ACTIVITY, TAG);
 
         reset();
 
@@ -221,6 +223,7 @@ public class GameActivity extends CustomActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        mAnalytics.trackAction(MixPanel.ACTION_BACK_PRESSED, MixPanel.TAG_ACTIVITY, TAG);
         thread.kill();
         reset();
         finish();

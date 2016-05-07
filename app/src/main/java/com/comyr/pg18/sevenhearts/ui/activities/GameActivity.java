@@ -2,26 +2,20 @@ package com.comyr.pg18.sevenhearts.ui.activities;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.comyr.pg18.sevenhearts.R;
 import com.comyr.pg18.sevenhearts.background.tasks.GameInitTask;
-import com.comyr.pg18.sevenhearts.background.tasks.GameTask;
 import com.comyr.pg18.sevenhearts.background.threads.GameThread;
 import com.comyr.pg18.sevenhearts.game.resources.Card;
 import com.comyr.pg18.sevenhearts.game.resources.Deck;
 import com.comyr.pg18.sevenhearts.game.resources.Player;
 import com.comyr.pg18.sevenhearts.game.resources.Table;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
-import com.comyr.pg18.sevenhearts.game.resources.utils.PlayerStateChangeListener;
-import com.comyr.pg18.sevenhearts.game.resources.utils.TableStateChangeListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.PlayerNotFoundException;
 import com.comyr.pg18.sevenhearts.ui.activities.base.CustomActivity;
 import com.comyr.pg18.sevenhearts.ui.utils.FontUtils;
-import com.comyr.pg18.sevenhearts.ui.utils.GameData;
 import com.comyr.pg18.sevenhearts.ui.utils.helper.ActivityOptionHelper;
 import com.comyr.pg18.sevenhearts.ui.views.CardView;
 import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
@@ -29,11 +23,12 @@ import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class GameActivity extends CustomActivity implements PlayerStateChangeListener, TableStateChangeListener {
-
+public class GameActivity extends CustomActivity {
     private static final Object threadLock = new Object();
     private static GameThread thread;
+    // constants
     private final String TAG = "GameActivity";
+    // Game variables
     private ArrayList<Player> players;
     private Table table;
     private Deck deck;
@@ -41,14 +36,15 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
     private ArrayList<Card> thisPlayerCards;
     // player with current turn on the table
     private Player currentPlayer;
+    // UI
     private LinearLayout playerCardsLayout;
     private LinearLayout playersLayout;
     private TextView mainDisplayTextView;
     private GameActivity gameActivity;
     // table variables
     private CardView heartsUpperCard, heartsLowerCard, diamondsUpperCard, diamondsLowerCard, spadesUpperCard, spadesLowerCard, clubsUpperCard, clubsLowerCard;
+    // tasks and threads
     private GameInitTask gameInitTask;
-    private GameTask task;
 
     public static GameThread getThread() {
         return thread;
@@ -58,12 +54,6 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
         synchronized (threadLock) {
             GameActivity.thread = thread;
         }
-    }
-
-    public static void resumeThread() {
-        if (thread != null)
-            if (thread.isSuspended())
-                thread.resume();
     }
 
     public Player getThisPlayer() {
@@ -131,20 +121,21 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
         gameInitTask.execute();
     }
 
-    private void testTask() {
-        task = new GameTask(gameActivity);
-        task.execute();
-    }
-
+    /**
+     * Main display text view is used as a board to display game state changes
+     *
+     * @return main display text view
+     */
     public TextView getMainDisplayTextView() {
         return mainDisplayTextView;
     }
 
-    public void testThread() {
-        thread = new GameThread(gameActivity);
-        thread.start();
-    }
-
+    /**
+     * returns {@link PlayerView} object for given {@link Player} object
+     *
+     * @param player {@link Player} for which {@link PlayerView} object is to be returned
+     * @return {@link PlayerView} object.  Null, if {@link PlayerView} is not found
+     */
     public PlayerView getViewForPlayer(Player player) {
         for (int i = 0; i < playersLayout.getChildCount(); i++) {
             PlayerView pv = (PlayerView) playersLayout.getChildAt(i);
@@ -155,43 +146,13 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
         return null;
     }
 
-    private void initGameResources() {
-        initTable();
-
-        setupPlayers();
-
-        setupPlayerCards();
-    }
-
-    public void emptyCallback() {
-        resumeThread();
-//        resumeTask();
-    }
-
-    public void resumeTask() {
-        if (task != null)
-            task.resumeExecution();
-    }
-
-    private void initTable() {
-        Log.d("table status", "Initing table");
-        table = null;
-        GameData.initData();
-        String p2 = GameData.getRandomPlayerName();
-        String p3 = GameData.getRandomPlayerName();
-        String p4 = GameData.getRandomPlayerName();
-        String[] names = {GameData.thisPlayerName, p2, p3, p4};
-        Player[] players = new Player[names.length];
-        int i = 0;
-        for (String name : names) {
-            players[i] = new Player(name, this);
-            i++;
-        }
-        table = Table.getInstance(this, players);
-        table.init();
-        deck = table.getDeck();
-    }
-
+    /**
+     * returns {@link Player} object which is registered with current {@link Table} object
+     *
+     * @param name of the player for which {@link Player} object is to be returned
+     * @return player object
+     * @throws PlayerNotFoundException if given {@link Player} is not registered with current instance of {@link table}
+     */
     public Player getPlayerForName(String name) throws PlayerNotFoundException {
         Iterator<Player> it = players.iterator();
         while (it.hasNext()) {
@@ -201,58 +162,9 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
         throw new PlayerNotFoundException("In game activity, while getting this player");
     }
 
-    private void setupPlayers() {
-        try {
-            players = table.getPlayers();
-            thisPlayer = getPlayerForName(GameData.thisPlayerName);
-            table.distributeCards();
-            for (Player p : players) {
-                if (!p.equals(thisPlayer)) {
-                    PlayerView playerView = new PlayerView(this);
-                    playerView.setPlayer(p);
-                    playersLayout.addView(playerView);
-                }
-            }
-//        } catch (NullTableException e) {
-        } catch (PlayerNotFoundException e) {
-
-        }
-    }
-
-    private void setupPlayerCards() {
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                playerCardsLayout.removeAllViews();
-            }
-        });
-        thisPlayerCards = thisPlayer.getCards();
-        int i = 0;
-        for (Card c : thisPlayerCards) {
-            final CardView cv = new CardView(this);
-            cv.setCard(c);
-            cv.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Card clickedCard = ((CardView) v).getCard();
-                    boolean valid = table.isMoveValid(clickedCard);
-                    if (!valid) return;
-                    thread.setCurrentMove(clickedCard);
-                    emptyCallback();
-                }
-            });
-            if (i != 0)
-                cv.setNegativeMargin();
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    playerCardsLayout.addView(cv);
-                }
-            });
-            i++;
-        }
-    }
-
+    /**
+     * initiates UI components.
+     */
     @Override
     protected void initUI() {
         super.initUI();
@@ -274,6 +186,14 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
         spadesLowerCard = (CardView) findViewById(R.id.spades_lower_card);
     }
 
+    /**
+     * Every card which is played, is to be placed on the table in a layout
+     * this layout has 8 different {@link CardView} objects. Each card has
+     * to be placed correctly in one of these views. This method returns
+     * correct view for every {@link Card} that is passed
+     * @param c {@link Card} object for which view is to be returned
+     * @return appropriate {@link CardView} for given card
+     */
     @Nullable
     public CardView getCardViewOnTableFor(Card c) {
         int s = c.getSuit();
@@ -310,43 +230,6 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
     }
 
     @Override
-    public void onPlayerCardsExhausted(Player p) {
-        synchronized (table) {
-            table.removePlayerFromTable(p);
-        }
-    }
-
-    @Override
-    public void onPlayerCardsExhausted(Player p, String status) {
-        synchronized (table) {
-            table.removePlayerFromTable(p);
-        }
-    }
-
-    @Override
-    public void onPlayerSuitsRefreshed(final Player p) {
-        if (p.equals(thisPlayer)) {
-            setupPlayerCards();
-            emptyCallback();
-        } else {
-            PlayerView pv = getViewForPlayer(p);
-            if (pv != null) pv.updateNameWithCount();
-            emptyCallback();
-        }
-
-    }
-
-    @Override
-    public void onOnAllPageSure(final Player p) {
-
-    }
-
-    @Override
-    public void onCardAddedToTable(Table t, final Card c) {
-
-    }
-
-    @Override
     public void onBackPressed() {
         super.onBackPressed();
         thread.kill();
@@ -354,6 +237,11 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
         finish();
     }
 
+    /**
+     * resets the game state
+     * game is ready to be re-started,
+     * but, only after, this method is called
+     */
     private void reset() {
         gameInitTask = null;
         players = null;
@@ -364,38 +252,7 @@ public class GameActivity extends CustomActivity implements PlayerStateChangeLis
         thisPlayerCards = null;
         currentPlayer = null;
         gameActivity = null;
-        //task.cancel(true);
-        //task = null;
         thread = null;
-    }
-
-    @Override
-    public void onCardRemovedFromTable(Table t, Card c) {
-
-    }
-
-    @Override
-    public void onPlayerAddedToTable(Table t, Player p) {
-
-    }
-
-    @Override
-    public void onPlayerRemovedFromTable(Table t, Player p) {
-
-    }
-
-    @Override
-    public void onSuitsRefreshed(Table t) {
-
-    }
-
-    @Override
-    public void onTableFull(Table t) {
-
-    }
-
-    @Override
-    public void onPlayerWon(Player p) {
     }
 }
 

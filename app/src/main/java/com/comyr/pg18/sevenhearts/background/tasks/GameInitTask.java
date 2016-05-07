@@ -22,10 +22,7 @@ import java.util.Iterator;
  * In package com.comyr.pg18.sevenhearts.background.tasks
  */
 public class GameInitTask extends AsyncTask<String, Void, String> implements PlayerStateChangeListener, TableStateChangeListener {
-
-    private final String TAG = "GameInitTask";
     private GameActivity gameActivity;
-    private boolean cancelled;
 
     public GameInitTask(GameActivity gameActivity) {
         this.gameActivity = gameActivity;
@@ -38,6 +35,9 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
         return null;
     }
 
+    /**
+     * initiates all the resources required to start the game
+     */
     private void initGameResources() {
         initTable();
 
@@ -53,6 +53,9 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
         GameActivity.getThread().start();
     }
 
+    /**
+     * initiates an empty {@link Table} with 4 {@link Player} objects with default {@link GameData}
+     */
     private void initTable() {
         gameActivity.setTable(null);
         GameData.initData();
@@ -68,9 +71,11 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
         }
         gameActivity.setTable(Table.getInstance(this, players));
         gameActivity.getTable().init();
-        gameActivity.setDeck(gameActivity.getTable().getDeck());
     }
 
+    /**
+     * sets up {@link Player} objects and their corresponding {@link PlayerView} objects
+     */
     private void setupPlayers() {
         try {
             gameActivity.setPlayers(gameActivity.getTable().getPlayers());
@@ -95,6 +100,9 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
         }
     }
 
+    /**
+     * sets up {@link Card} objects which are in hand of the current {@link Player}
+     */
     private void setupPlayerCards() {
 
         gameActivity.runOnUiThread(new Runnable() {
@@ -139,14 +147,6 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
             });
             i++;
         }
-    }
-
-    public void kill() {
-        setCancelled(true);
-    }
-
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
     }
 
     @Override

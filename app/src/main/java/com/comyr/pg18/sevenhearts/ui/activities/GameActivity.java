@@ -9,7 +9,6 @@ import com.comyr.pg18.sevenhearts.R;
 import com.comyr.pg18.sevenhearts.background.tasks.GameInitTask;
 import com.comyr.pg18.sevenhearts.background.threads.GameThread;
 import com.comyr.pg18.sevenhearts.game.resources.Card;
-import com.comyr.pg18.sevenhearts.game.resources.Deck;
 import com.comyr.pg18.sevenhearts.game.resources.Player;
 import com.comyr.pg18.sevenhearts.game.resources.Table;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
@@ -31,11 +30,9 @@ public class GameActivity extends CustomActivity {
     // Game variables
     private ArrayList<Player> players;
     private Table table;
-    private Deck deck;
     private Player thisPlayer;
     private ArrayList<Card> thisPlayerCards;
-    // player with current turn on the table
-    private Player currentPlayer;
+
     // UI
     private LinearLayout playerCardsLayout;
     private LinearLayout playersLayout;
@@ -62,14 +59,6 @@ public class GameActivity extends CustomActivity {
 
     public void setThisPlayer(Player tp) {
         thisPlayer = tp;
-    }
-
-    public Deck getDeck() {
-        return deck;
-    }
-
-    public void setDeck(Deck d) {
-        deck = d;
     }
 
     public ArrayList<Card> getThisPlayerCards() {
@@ -247,10 +236,8 @@ public class GameActivity extends CustomActivity {
         players = null;
         Table.reset();
         table = null;
-        deck = null;
         thisPlayer = null;
         thisPlayerCards = null;
-        currentPlayer = null;
         gameActivity = null;
         thread = null;
     }

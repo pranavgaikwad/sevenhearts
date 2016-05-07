@@ -75,7 +75,7 @@ public class PlayerView extends LinearLayout {
     }
 
 
-    private int getRandomUserImage() {
+    private synchronized int getRandomUserImage() {
         Stack<Integer> drawables = new Stack<>();
         int[] ids = {R.drawable.ic_player_young, R.drawable.ic_player_thief, R.drawable.ic_player_tennis, R.drawable.ic_player_swat, R.drawable.ic_player_motor, R.drawable.ic_player_mature, R.drawable.ic_player_b_golfer, R.drawable.ic_player_detective, R.drawable.ic_player_golfer};
         for (int id : ids) {

@@ -22,6 +22,7 @@ public class CustomActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState, PersistableBundle persistentState) {
         super.onCreate(savedInstanceState, persistentState);
+        mAnalytics = MixPanel.getInstance(this);
     }
 
     @Override

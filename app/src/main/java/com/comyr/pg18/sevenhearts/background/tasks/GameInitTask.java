@@ -177,8 +177,14 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
 
 
     @Override
-    public void onOnAllPageSure(Player p) {
-
+    public void onOnAllPageSure(final Player p) {
+        gameActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (gameActivity.getViewForPlayer(p) != null)
+                    gameActivity.getViewForPlayer(p).setOnPageSureColor();
+            }
+        });
     }
 
     @Override

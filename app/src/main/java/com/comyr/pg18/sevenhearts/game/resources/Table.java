@@ -174,6 +174,7 @@ public class Table {
         updateSuits();
         updateOpenCards();
         checkTableFull();
+        checkAllPageSure();
     }
 
     /**
@@ -351,6 +352,60 @@ public class Table {
             if (p.hasCard(new Card(Cards.SEVEN, Suits.HEARTS))) return p;
         }
         return null;
+    }
+
+    /**
+     * checks if any of the players is all page sure at
+     * current point of time.
+     */
+    public void checkAllPageSure() {
+        Iterator<Player> it = players.iterator();
+        while (it.hasNext()) {
+            Player p = it.next();
+            if (isAllPageSure(p)) p.getL().onOnAllPageSure(p);
+        }
+    }
+
+    /**
+     * checks if the given {@link Player} is all page sure
+     *
+     * @param p {@link Player} object to check all page sure
+     * @return true if given player is all page sure, false otherwise
+     */
+    private boolean isAllPageSure(Player p) {
+        Iterator<Card> i = p.getCards().iterator();
+        while (i.hasNext()) {
+            Card c = i.next();
+            if (!isCardSure(c, p)) return false;
+        }
+        return true;
+    }
+
+    /**
+     * checks if the given {@link Card} can be played, by specified {@link Player}
+     *
+     * @param c {@link Card} to be checked against available moves
+     * @return true if card can be played, false otherwise.
+     */
+    private boolean isCardSure(Card c, Player p) {
+        if (c.getRank() < 6) {
+            if (p.hasCard(new Card(c.getRank() + 1, c.getSuit()))) return true;
+            if (hasCard(new Card(c.getRank() + 1, c.getSuit()))) return true;
+            else return false;
+        } else {
+            if (p.hasCard(new Card(c.getRank() - 1, c.getSuit()))) return true;
+            if (hasCard(new Card(c.getRank() - 1, c.getSuit()))) return true;
+            else return false;
+        }
+    }
+
+    private boolean hasCard(Card c) {
+        Iterator<Suit> it = localSuits.iterator();
+        while (it.hasNext()) {
+            Suit s = it.next();
+            if (c.getSuit() == s.getSuit()) if (s.contains(c)) return true;
+        }
+        return false;
     }
 
     /**

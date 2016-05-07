@@ -68,8 +68,8 @@ public class Player {
         return localSuits;
     }
 
-    public boolean isAllPageSure() {
-        return equalLists(cards, Table.getAvailableMovesFor(this));
+    public PlayerStateChangeListener getL() {
+        return l;
     }
 
     private boolean equalLists(List<Card> one, List<Card> two) {
@@ -136,10 +136,6 @@ public class Player {
         l.onPlayerSuitsRefreshed(this);
     }
 
-    public void untakeMove(Card ct) {
-        giveCard(ct);
-    }
-
     public String getName() {
         return name;
     }
@@ -169,13 +165,7 @@ public class Player {
     private void updatePlayerState() {
         updateScore();
         updateSuits(l);
-        // checkAllPageSure();
     }
-
-    private void checkAllPageSure() {
-        if (isAllPageSure()) l.onOnAllPageSure(this);
-    }
-
 
     /**
      * plays given card

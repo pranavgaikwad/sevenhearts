@@ -9,6 +9,7 @@ import com.comyr.pg18.sevenhearts.game.resources.Table;
 import com.comyr.pg18.sevenhearts.game.solution.Solver;
 import com.comyr.pg18.sevenhearts.network.analytics.MixPanel;
 import com.comyr.pg18.sevenhearts.ui.activities.GameActivity;
+import com.comyr.pg18.sevenhearts.ui.sys.SysUtils;
 import com.comyr.pg18.sevenhearts.ui.views.CardView;
 import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
 
@@ -214,6 +215,7 @@ public class GameThread implements Runnable {
      * kills the thread
      */
     public void kill() {
+        cnt = 0;
         currentPlayer = null;
         currentMove = null;
         thread.interrupt();
@@ -257,6 +259,8 @@ public class GameThread implements Runnable {
         }
     }
 
+    // TODO : following is a workaround
+    static int cnt = 0;
     /**
      * displays which player is currently thinking
      * @param currentPlayer {@link Player} who is thinking
@@ -274,7 +278,12 @@ public class GameThread implements Runnable {
                 } else {
                     final String msg = "<font color=\"#ffff00\">Your move...</font>";
                     activity.getMainDisplayTextView().setText(Html.fromHtml(msg));
+                    if (cnt != 0) {
+                        SysUtils.vibrate(activity);
+                        SysUtils.playUserMoveSound(activity);
+                    }
                     GameActivity.getThread().resume();
+                    cnt++;
                 }
             }
         });

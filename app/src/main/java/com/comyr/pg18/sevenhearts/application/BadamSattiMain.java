@@ -14,7 +14,6 @@ import java.io.StringWriter;
  * In package com.comyr.pg18.sevenhearts.application
  */
 public class BadamSattiMain extends Application {
-
     @Override
     public void onCreate() {
         super.onCreate();

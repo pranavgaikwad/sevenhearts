@@ -186,8 +186,11 @@ public class Player {
      */
     private void updateScore() {
         score = 0;
-        for (Card c : cards)
-            score = score + c.getRank() + 1; // 2
+        Iterator<Card> it = cards.iterator();
+        while(it.hasNext()) {
+            Card c = it.next();
+            score = score +  c.getRank() + 1;
+        }
     }
 
     /**

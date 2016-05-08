@@ -54,14 +54,19 @@ public class CustomActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * override this method in derived activities to perform initialization tasks
+     */
     protected void initUI() {
-
     }
 
     public MixPanel getmAnalytics() {
         return mAnalytics;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onDestroy() {
         mAnalytics.flush();

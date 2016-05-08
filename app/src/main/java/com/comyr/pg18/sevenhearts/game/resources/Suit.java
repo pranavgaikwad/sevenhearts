@@ -11,10 +11,27 @@ import java.util.Iterator;
 import java.util.Random;
 
 public class Suit {
+    /**
+     * status suit empty constant
+     */
     private final int SUIT_EMPTY = -1;
+    /**
+     * suit id. obtained from
+     * Refer : {@link Suits}
+     */
     public int suit;
+    /**
+     * suit name. obtained from
+     * Refer : {@link Constants} @see Constants#SUITS
+     */
     public String suitName;
+    /**
+     * open cards for current suit (Cards that can be played in current suit)
+     */
     public ArrayList<Card> availableCards;
+    /**
+     * list of cards in the suit
+     */
     private ArrayList<Card> cards;
 
     /**

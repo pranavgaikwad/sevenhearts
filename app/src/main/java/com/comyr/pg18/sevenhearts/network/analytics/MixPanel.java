@@ -20,13 +20,12 @@ public class MixPanel {
     public static final String TAG_ACTIVITY = "Activity";
     public static final String TAG_PLAYER = "Player";
     public static final String TAG_CAUSE = "Cause";
+
     private static MixPanel instance = null;
     private final String PROJECT_TOKEN = "1fbc375b41f87af3dd14780f059a862a";
-    private Context context;
     private MixpanelAPI api;
 
     public MixPanel(Context context) {
-        this.context = context;
         api = MixpanelAPI.getInstance(context, PROJECT_TOKEN);
     }
 
@@ -45,6 +44,10 @@ public class MixPanel {
         instance = null;
     }
 
+    /**
+     * base track action method
+     * @param action @see MixPanel for action constants
+     */
     public void trackAction(String action) {
         api.track(action);
     }
@@ -53,6 +56,13 @@ public class MixPanel {
         api.track(action, payload);
     }
 
+    /**
+     * tracks action along with payload. A payload is made of Strings.
+     * Payload is a key-value pair. So, first String is the key while
+     * immediate next param is value for that key.
+     * @param action   action to be tracked For example, @see MixPanel for actions
+     * @param payloads Key-Value pairs
+     */
     public void trackAction(String action, String... payloads) {
         JSONObject jsonObject = new JSONObject();
         try {
@@ -74,5 +84,4 @@ public class MixPanel {
     public void flush() {
         api.flush();
     }
-
 }

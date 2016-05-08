@@ -17,14 +17,43 @@ import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
  * In package com.comyr.pg18.sevenhearts.ui.threads
  */
 public class GameThread implements Runnable {
+    /**
+     * used as a lock on @see GameThread#currentMove
+     * avoids concurrent update of #currentMove
+     * #currentMove is updated from UI thread and background thread as well
+     */
     private static final Object lock = new Object();
+    /**
+     * termination condition for game loop
+     */
     public static boolean isFinished = false;
+    /**
+     * current player who will play current move
+     */
     public static Player currentPlayer;
+    /**
+     * used as a lock on #ct to avoid concurrent manipulation
+     */
     private final Object moveLock = new Object();
+    /**
+     * stores card that human player clicks
+     */
     private Card currentMove;
+    /**
+     * game thread object
+     */
     private Thread thread;
+    /**
+     * string identifier for current thread instance
+     */
     private String name;
+    /**
+     * checks if the thread is suspended @see GameThread#resume @see GameThread#suspend
+     */
     private boolean suspended = false;
+    /**
+     * activity object to keep in touch with the UI thread
+     */
     private GameActivity activity;
 
     public GameThread(GameActivity activity) {

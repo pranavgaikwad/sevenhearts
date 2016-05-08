@@ -13,16 +13,31 @@ import java.util.List;
 import static java.util.Collections.sort;
 
 public class Player {
+    /**
+     * player id. used in @see Player#equals
+     */
     private String id;
+    /**
+     * player name
+     */
     private String name;
-
-    // keeps the sum of ranks of
-    // all possessed cards
+    /**
+     * sum of ranks of all the cards in player's hand
+     */
     private int score;
-
+    /**
+     * cards of the current player
+     */
     private ArrayList<Card> cards;
+    /**
+     * used to broadcast updated player state
+     */
     private PlayerStateChangeListener l;
-
+    /**
+     * player arranges cards in suits
+     * this variable is used as empty suit container
+     * to hold cards. It is updated after every move @see Player#updateSuits
+     */
     private ArrayList<Suit> localSuits;
 
     /**
@@ -70,37 +85,6 @@ public class Player {
 
     public PlayerStateChangeListener getL() {
         return l;
-    }
-
-    private boolean equalLists(List<Card> one, List<Card> two) {
-        if (one == null && two == null) {
-            return true;
-        }
-
-        if ((one == null && two != null)
-                || one != null && two == null
-                || one.size() != two.size()) {
-            return false;
-        }
-
-        //to avoid messing the order of the lists we will use a copy
-        //as noted in comments by A. R. S.
-        one = new ArrayList<Card>(one);
-        two = new ArrayList<Card>(two);
-
-        sort(one, new Comparator<Card>() {
-            @Override
-            public int compare(Card lhs, Card rhs) {
-                return lhs.compareTo(rhs);
-            }
-        });
-        sort(two, new Comparator<Card>() {
-            @Override
-            public int compare(Card lhs, Card rhs) {
-                return lhs.compareTo(rhs);
-            }
-        });
-        return one.equals(two);
     }
 
     /**

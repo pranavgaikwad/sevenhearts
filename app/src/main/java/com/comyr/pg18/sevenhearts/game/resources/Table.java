@@ -13,17 +13,45 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class Table {
+    /**
+     * this arraylist holds the list of cards that can be played by player (cards are open)
+     */
     private static ArrayList<Card> openCards = new ArrayList<Card>();
+    /**
+     * static instance of the table
+     */
     private static Table instance = null;
+    /**
+     * cards on the table are arranged in suits
+     * these suits are refreshed after every
+     * card that is placed on the table
+     */
     private final ArrayList<Suit> localSuits = new ArrayList<Suit>();
-    // used for synchronization
+    /**
+     * this lock is used on index of the current player @see Table#currentPlayerIndex
+     * avoids concurrent update on #currentPlayerIndex
+     */
     private final Object lock = new Object();
-    private final String TAG = "Table";
-    private final String DEBUG_TAG = "__Table__";
+    /**
+     * deck of cards registered with the table
+     */
     private Deck deck;
+    /**
+     * list of players that will hold all the registered players
+     */
     private ArrayList<Player> players;
+    /**
+     * cards placed on table
+     */
     private ArrayList<Card> cards;
+    /**
+     * Current player is the player who will play current move
+     * this variable keeps track of current player from #players list
+     */
     private int currentPlayerIndex;
+    /**
+     * used to broadcast changed table state
+     */
     private TableStateChangeListener l;
     // following boolean value checks if any of the player has won or not
     // true if current player is first player to get removed from the table
@@ -47,7 +75,10 @@ public class Table {
         currentPlayerIndex = 0;
     }
 
-    // take care of all the static members while resetting
+    /**
+     * resets table instance and all the static variables associated with it
+     * Table is ready to be re-started after call to this method
+     */
     public static void reset() {
         if (instance != null) {
             synchronized (instance) {
@@ -139,11 +170,13 @@ public class Table {
         updateTableStatus();
     }
 
+    /**
+     * distributes cards from #deck to all the #players
+     */
     public void distributeCards() {
         deck.distributeCardsToPlayers(this);
         try {
             Player p = whoHasSevenOfHearts();
-            Log.d(TAG, "who has seven of hearts : " + p.getName());
             if (p != null) {
                 synchronized (lock) {
                     currentPlayerIndex = getPlayerIndex(p);
@@ -152,10 +185,12 @@ public class Table {
             else
                 throw new PlayerNotFoundException();
         } catch (PlayerNotFoundException e) {
-            Log.d(TAG, "caught player not found");
         }
     }
 
+    /**
+     * removes all #cards from the table
+     */
     public void removeAllCards() {
         Iterator<Card> it = cards.iterator();
         while (it.hasNext()) {
@@ -304,7 +339,7 @@ public class Table {
     }
 
     /**
-     * checks if table cannot accomodate cards anymore
+     * checks if table can accomodate cards anymore or not
      *
      * @return true if full, false otherwise
      */
@@ -399,6 +434,11 @@ public class Table {
         }
     }
 
+    /**
+     * checks if given card is already placed on the table
+     * @param c card to check
+     * @return true if placed, false otherwise
+     */
     private boolean hasCard(Card c) {
         Iterator<Suit> it = localSuits.iterator();
         while (it.hasNext()) {
@@ -424,9 +464,9 @@ public class Table {
     }
 
     /**
-     * returns index for the given player
-     *
-     * @param p player
+     * players are stored in an arraylist for given table instance
+     * this method returns the index of the player in this array list. @see Table#players
+     * @param p player to get index for
      * @return index of the player
      * @throws PlayerNotFoundException if player is not available on the current table
      */
@@ -442,7 +482,7 @@ public class Table {
     }
 
     /**
-     * returns current status of the table in {@link String} object
+     * returns current status of the table as {@link String} object
      *
      * @return status
      */
@@ -456,7 +496,7 @@ public class Table {
     }
 
     /**
-     * returns status of cards on table as a string description
+     * returns status of cards on table as {@link String} object
      *
      * @return status of cards put on table
      * TODO: arrange in suits

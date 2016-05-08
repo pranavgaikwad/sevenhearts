@@ -5,8 +5,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+/**
+ * This class is not a part of Android Application
+ * This class is used to test the game on CLI
+ */
 public class FileHelper {
-
     private static FileHelper instance;
     private final String FILE_COUNT = "/home/pranav/Desktop/cardgame/count.txt";
     private final String FILE_GAME = "/home/pranav/Desktop/cardgame/game.txt";

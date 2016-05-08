@@ -3,13 +3,29 @@ package com.comyr.pg18.sevenhearts.game.resources;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
 
 public class Card {
-    private String id;        // used to match cards
+    /**
+     * card id. used in @see Card#equals
+     */
+    private String id;
+    /**
+     * card rank
+     */
     private int rank;
+    /**
+     * suit to which this card belongs
+     */
     private int suit;
+    /**
+     * string representation of the rank @see Constants#CARDS
+     */
     private String rankName;
+    /**
+     * string representation of the suit @see Constants#SUITS
+     */
     private String suitName;
-
-    // used to set id for view
+    /**
+     * unique identifier. (currently not used anywhere. to be used in {@link com.comyr.pg18.sevenhearts.game.solution.Solver})
+     */
     private int identifier;
 
     /**

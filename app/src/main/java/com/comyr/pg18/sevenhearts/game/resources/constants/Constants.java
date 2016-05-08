@@ -18,11 +18,4 @@ public class Constants {
     public static final String MESSAGE_CARD_EXCEPTION = "General card exception";
     public static final String MESSAGE_CARD_NOT_FOUND = "Card not found";
     public static final String MESSAGE_NULL_TABLE = "Null table";
-
-    public static final int END_HIGH = 1;
-    public static final int END_LOW = -1;
-
-    public static String getNameForCardIndex(int i) {
-        return CARDS[i];
-    }
 }

@@ -16,7 +16,10 @@ import com.comyr.pg18.sevenhearts.ui.utils.CustomActivityOptions;
  * This activity is LANDSCAPE ONLY
  */
 public class CustomActivity extends AppCompatActivity {
-    private final String TAG = "CustomActivity";
+    /**
+     * analytics instance associated with this and all other
+     * derived classes from this activity.
+     */
     protected MixPanel mAnalytics;
 
     @Override
@@ -33,6 +36,10 @@ public class CustomActivity extends AppCompatActivity {
         mAnalytics = MixPanel.getInstance(this);
     }
 
+    /**
+     * sets customizable options for instance of the activity
+     * @param options Refer : {@link CustomActivityOptions} for detailed info
+     */
     protected void setOptions(CustomActivityOptions options) {
         for (String option : options.getOptions()) {
             switch (option) {

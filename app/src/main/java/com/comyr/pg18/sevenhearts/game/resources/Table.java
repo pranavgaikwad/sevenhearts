@@ -372,7 +372,7 @@ public class Table {
      * @param p {@link Player} object to check all page sure
      * @return true if given player is all page sure, false otherwise
      */
-    private boolean isAllPageSure(Player p) {
+    private synchronized boolean isAllPageSure(Player p) {
         Iterator<Card> i = p.getCards().iterator();
         while (i.hasNext()) {
             Card c = i.next();

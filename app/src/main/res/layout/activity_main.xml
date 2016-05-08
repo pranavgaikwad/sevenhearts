@@ -37,9 +37,6 @@
             android:id="@+id/edit_text_player_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
             android:text="Player1"
             android:textColor="#ffffff" />
 
@@ -47,9 +44,6 @@
             android:id="@+id/button_player_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBottom="@+id/edit_text_player_name"
-            android:layout_toEndOf="@+id/edit_text_player_name"
-            android:layout_toRightOf="@+id/edit_text_player_name"
             android:text="OK" />
 
     </LinearLayout>

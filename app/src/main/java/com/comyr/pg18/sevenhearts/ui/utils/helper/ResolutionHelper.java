@@ -14,13 +14,18 @@ import com.comyr.pg18.sevenhearts.ui.utils.CustomResolution;
 public class ResolutionHelper {
     public static final int VIEW_CARD = 0;
     public static final int VIEW_PLAYER = 1;
-    private static ResolutionHelper instance;
-    private final String TAG = "ResolutionHelper";
+
+    /**
+     * instance of the class
+     */
+    private static ResolutionHelper instance = null;
+    /**
+     * holds current screen resolution {@see ResolutionHelper#loadScreenResolution}
+     */
     private CustomResolution screenResolution;
 
 
     public ResolutionHelper() {
-
     }
 
     public static ResolutionHelper getInstance() {
@@ -31,7 +36,8 @@ public class ResolutionHelper {
 
     /**
      * loads current screen resolution
-     *
+     * make sure that screen resolution is loaded everytime you use
+     * instance of this class.
      * @param context context for activity
      */
     public void loadScreenResolution(Context context) {
@@ -72,6 +78,13 @@ public class ResolutionHelper {
         return (int) dp;
     }
 
+    /**
+     * returns {@link CustomResolution} object for given view
+     *
+     * @param view For example, @see ResolutionHelper#VIEW_CARD
+     * @return {@link CustomResolution} object that holds resolutions
+     * for specified view (in pixels)
+     */
     public CustomResolution getResolutionForView(int view) {
         CustomResolution res;
         switch (view) {
@@ -96,7 +109,7 @@ public class ResolutionHelper {
      * for aspect ratio of 0.60, dimensions 9 x 20 are suited best
      * for aspect ratio of p, dimensions are 9 x 20 x p / 0.60
      *
-     * @return ValuePair just binds height and weight together in an object
+     * @return {@link ValuePair} just binds height and weight together in an object
      */
     private ValuePair getPossibleResolution() {
         double p = screenResolution.getRatio();
@@ -105,22 +118,21 @@ public class ResolutionHelper {
         return new ValuePair((int) widthValue, (int) heightValue);
     }
 
+    /**
+     * class that helps handle width and height together as an object
+     */
     private class ValuePair {
         private int w;
         private int h;
 
         public ValuePair(int w, int h) {
             this.w = w;
-            this.h = h;
-        }
-
+            this.h = h; }
         public int getH() {
             return h;
         }
-
         public int getW() {
             return w;
         }
     }
-
 }

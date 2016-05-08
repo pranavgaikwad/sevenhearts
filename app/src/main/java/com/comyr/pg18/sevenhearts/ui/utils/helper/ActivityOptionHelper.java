@@ -11,6 +11,16 @@ public class ActivityOptionHelper {
     public static final int ACTIVITY_MAIN = 0;
     public static final int ACTIVITY_GAME = 1;
 
+    /**
+     * Every new activity that has to be created is to be inherited from
+     * {@link com.comyr.pg18.sevenhearts.ui.activities.base.CustomActivity}
+     * CustomAcitivity takes different options to customize activity behaviour
+     * following method is used to get {@link CustomActivityOptions} object for
+     * required activity.
+     *
+     * @param i For example, @see ActivityOptionHelper#ACTIVITY_GAME
+     * @return {@link CustomActivityOptions} object
+     */
     public static CustomActivityOptions getOptionsForActivity(int i) {
         CustomActivityOptions options = new CustomActivityOptions();
         switch (i) {

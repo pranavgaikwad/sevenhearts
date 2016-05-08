@@ -181,8 +181,10 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
         gameActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (gameActivity.getViewForPlayer(p) != null)
+                if (gameActivity.getViewForPlayer(p) != null) {
                     gameActivity.getViewForPlayer(p).setOnPageSureColor();
+                    // Toast.makeText(gameActivity, p.getName() + " is all page sure", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }

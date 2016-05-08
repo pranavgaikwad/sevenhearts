@@ -24,14 +24,30 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class GameActivity extends CustomActivity {
+    /**
+     * used to synchronize access to @see GameActivity#thread
+     */
     private static final Object threadLock = new Object();
+    /**
+     * main {@link GameThread} object
+     */
     private static GameThread thread;
-    // constants
     private final String TAG = "GameActivity";
-    // Game variables
+    /**
+     * holds players registered with current table. Refer : {@link Player}
+     */
     private ArrayList<Player> players;
+    /**
+     * current table to which all the players and cards are registered. Refer : {@link Table}
+     */
     private Table table;
+    /**
+     * the human player
+     */
     private Player thisPlayer;
+    /**
+     * cards of the human player
+     */
     private ArrayList<Card> thisPlayerCards;
 
     // UI
@@ -39,9 +55,13 @@ public class GameActivity extends CustomActivity {
     private LinearLayout playersLayout;
     private TextView mainDisplayTextView;
     private GameActivity gameActivity;
-    // table variables
+    /**
+     * cards when played, are placed on table. Table has different {@link CardView} objects to show cards on table.
+     */
     private CardView heartsUpperCard, heartsLowerCard, diamondsUpperCard, diamondsLowerCard, spadesUpperCard, spadesLowerCard, clubsUpperCard, clubsLowerCard;
-    // tasks and threads
+    /**
+     * Background task that initiates the game. Refer : {@link GameInitTask}
+     */
     private GameInitTask gameInitTask;
 
     public static GameThread getThread() {
@@ -243,6 +263,10 @@ public class GameActivity extends CustomActivity {
         thisPlayerCards = null;
         gameActivity = null;
         thread = null;
+        /**
+         * reload player avatars to ensure unique drawables
+         */
+        PlayerView.reloadDrawables();
     }
 }
 

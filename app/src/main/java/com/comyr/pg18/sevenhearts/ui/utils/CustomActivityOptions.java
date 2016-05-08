@@ -8,18 +8,31 @@ import java.util.ArrayList;
 public class CustomActivityOptions {
     public static final String OPTION_LANDSCAPE = "landscape";
     public static final String OPTION_NO_ACTION_BAR = "noab";
-    private final String TAG = "CustomActivityOptions : ";
+
+    /**
+     * an arraylist to store options string
+     * for example, @see CustomActivityOptions#OPTION_LANDSCAPE
+     */
     private ArrayList<String> options;
-    private int count;
 
     public CustomActivityOptions() {
         options = new ArrayList<>();
     }
 
+    /**
+     * add new option to current {@link CustomActivityOptions} object
+     *
+     * @param option @see CustomActivityOptions
+     */
     public void addNewOption(String option) {
         options.add(option);
     }
 
+    /**
+     * checks if the given option is present in options list @see CustomActivityOptions#options
+     * @param option option
+     * @return true if the option is set, false otherwise
+     */
     public boolean isOptionSet(String option) {
         for (String o : options) {
             if (o.equals(option)) return true;

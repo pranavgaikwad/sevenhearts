@@ -11,7 +11,13 @@ import java.lang.ref.SoftReference;
  * In package com.comyr.pg18.sevenhearts.ui.utils
  */
 public class FontUtils {
+    /**
+     * font used in main display text view (shows game state information)
+     */
     public static final int FONT_ELECTRONIC = 0;
+    /**
+     * used as main base font to draw text
+     */
     public static final int FONT_CARTWHEEL = 1;
 
     private static final LruCache<String, SoftReference<Typeface>> mTypefaceCache;
@@ -26,8 +32,8 @@ public class FontUtils {
 
     /**
      * @param context      pass activity context
-     * @param typefacetype check FontHelper class for typeface codes
-     * @return
+     * @param typefacetype check {@link FontUtils} class for typeface codes
+     * @return required {@link Typeface}
      */
     public static Typeface getTypeface(Context context, int typefacetype) {
         if (context == null)

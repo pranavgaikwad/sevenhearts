@@ -188,13 +188,12 @@ public class GameThread implements Runnable {
                         @Override
                         public void run() {
                             activity.getMainDisplayTextView().setText(Html.fromHtml("<font color=\"#00ff00\">Player won : " + currentPlayer.getName() + "</font>"));
-                            PlayerView pv = activity.getViewForPlayer(currentPlayer);
-                            if (pv == null) {
-                                GameActivity.getThread().resume();
-                            } else {
-                                pv.setCurrentPlayer();
-                                GameActivity.getThread().resume();
+                            try {
+                                Thread.sleep(500);
+                            } catch (InterruptedException e) {
                             }
+                            activity.showScoreCard();
+                            activity.getThread().resume();
                         }
                     });
                     // waits for UI refresh

@@ -222,7 +222,6 @@ public class GameThread implements Runnable {
         thread.interrupt();
         currentMove = null;
         thread = null;
-        cnt = 0;
         currentPlayer = null;
     }
 
@@ -263,10 +262,9 @@ public class GameThread implements Runnable {
         }
     }
 
-    // TODO : following is a workaround
-    static int cnt = 0;
     /**
      * displays which player is currently thinking
+     *
      * @param currentPlayer {@link Player} who is thinking
      */
     private void showPlayerThinking(final Player currentPlayer) {
@@ -278,16 +276,13 @@ public class GameThread implements Runnable {
                     final String msg = currentPlayer.getName() + " is thinking";
                     activity.getMainDisplayTextView().setText(Html.fromHtml(msg));
                     pv.setCurrentPlayer();
-                    if(GameActivity.getThread() != null) GameActivity.getThread().resume();
+                    if (GameActivity.getThread() != null) GameActivity.getThread().resume();
                 } else {
                     final String msg = "<font color=\"#ffff00\">Your move...</font>";
                     activity.getMainDisplayTextView().setText(Html.fromHtml(msg));
-                    if (cnt != 0) {
-                        SysUtils.vibrate(activity);
-                        SysUtils.playUserMoveSound(activity);
-                    }
-                    if(GameActivity.getThread() != null) GameActivity.getThread().resume();
-                    cnt++;
+                    SysUtils.vibrate(activity);
+                    SysUtils.playUserMoveSound(activity);
+                    if (GameActivity.getThread() != null) GameActivity.getThread().resume();
                 }
             }
         });

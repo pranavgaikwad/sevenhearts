@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:fbutton="http://schemas.android.com/apk/res-auto"
+    android:visibility="invisible">
+    -->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fbutton="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/container_score_card"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_centerInParent="true"
+    android:background="@android:color/black"
+    android:padding="8dp">
+
+    <TextView
+        android:id="@+id/title_scorecard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="@string/string_title_scorecard"
+        android:textColor="@color/text_title_scorecard"
+        android:textSize="25sp" />
+
+    <LinearLayout
+        android:id="@+id/container_player_scores"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/title_scorecard"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"></LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/container_player_scores"
+        android:layout_marginTop="10dp"
+        android:gravity="center_horizontal">
+
+        <info.hoang8f.widget.FButton
+            android:id="@+id/button_restart_game"
+            android:layout_width="64dp"
+            android:layout_height="36dp"
+            android:layout_marginRight="10dp"
+            android:text="@string/text_restart_button"
+            android:textColor="@color/white"
+            fbutton:buttonColor="@color/fbutton_color_green"
+            fbutton:cornerRadius="5dp"
+            fbutton:shadowColor="@color/fbutton_color_green_dark"
+            fbutton:shadowEnabled="true"
+            fbutton:shadowHeight="5dp" />
+
+        <info.hoang8f.widget.FButton
+            android:id="@+id/button_exit_game"
+            android:layout_width="64dp"
+            android:layout_height="36dp"
+            android:layout_marginLeft="10dp"
+            android:text="@string/text_exit_button"
+            android:textColor="@color/white"
+            fbutton:buttonColor="@color/fbutton_color_red"
+            fbutton:cornerRadius="5dp"
+            fbutton:shadowColor="@color/fbutton_color_red_dark"
+            fbutton:shadowEnabled="true"
+            fbutton:shadowHeight="5dp" />
+    </LinearLayout>
+
+</RelativeLayout>
+    <!--
+</RelativeLayout>
+-->

@@ -2,7 +2,9 @@ package com.comyr.pg18.sevenhearts.network.analytics;
 
 
 import android.content.Context;
+import android.os.Build;
 
+import com.comyr.pg18.sevenhearts.BuildConfig;
 import com.mixpanel.android.mpmetrics.MixpanelAPI;
 
 import org.json.JSONException;
@@ -16,8 +18,12 @@ public class MixPanel {
     public static final String ACTION_ACTIVITY_OPEN = "Activity Open";
     public static final String ACTION_BACK_PRESSED = "Back Press";
     public static final String ACTION_PLAYER_WON = "Won";
+    public static final String ACTION_GAME_RESTART = "Restart Game";
+    public static final String ACTION_GAME_EXIT = "Exit Game";
+    public static final String ACTION_HIGHEST_SCORE = "Highest Score";
     public static final String ACTION_CRASH = "Crash";
     public static final String TAG_ACTIVITY = "Activity";
+    public static final String TAG_SCORE = "Score";
     public static final String TAG_PLAYER = "Player";
     public static final String TAG_CAUSE = "Cause";
 
@@ -49,11 +55,20 @@ public class MixPanel {
      * @param action @see MixPanel for action constants
      */
     public void trackAction(String action) {
-        api.track(action);
+        if(BuildConfig.DEBUG) {
+            api.track(action);
+        }
     }
 
+    /**
+     * track action method with json payload
+     * @param action action string for example, @see MixPanel#ACTION_ACTIVITY_OPEN
+     * @param payload json payload
+     */
     public void trackAction(String action, JSONObject payload) {
-        api.track(action, payload);
+        if(BuildConfig.DEBUG) {
+            api.track(action, payload);
+        }
     }
 
     /**

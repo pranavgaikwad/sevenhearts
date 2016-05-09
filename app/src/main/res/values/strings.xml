@@ -1,4 +1,16 @@
 <resources>
     <string name="app_name">Badam Satti</string>
-    <string name="crash_toast_text">Report crash</string>
+
+    <string name="string_title_main_board">Badam Satti</string>
+    <string name="string_title_scorecard">SCORECARD</string>
+    <string name="string_title_suit_hearts">HEARTS</string>
+    <string name="string_title_suit_spades">SPADES</string>
+    <string name="string_title_suit_diamonds">DIAMONDS</string>
+    <string name="string_title_suit_clubs">CLUBS</string>
+    <string name="string_title_play_button_label">Play</string>
+
+    <string name="text_welcome">Welcome to Badam Satti !</string>
+    <string name="text_play_button">Play</string>
+    <string name="text_restart_button">Restart</string>
+    <string name="text_exit_button">Exit</string>
 </resources>

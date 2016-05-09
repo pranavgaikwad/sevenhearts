@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:fbutton="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,42 +11,20 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".ui.activities.MainActivity">
 
-    <at.markushi.ui.CircleButton
+    <info.hoang8f.widget.FButton
         android:id="@+id/button_play_game"
-        android:layout_width="72dip"
-        android:layout_height="72dip"
+        android:layout_width="72dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:text="@string/text_play_button"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_play"
-        app:cb_color="#FFdd00"
-        app:cb_pressedRingWidth="8dip" />
-
-    <LinearLayout
-        android:id="@+id/main_activity_cont1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:background="#90000000"
-        android:orientation="horizontal"
-        android:visibility="invisible">
-
-        <EditText
-            android:id="@+id/edit_text_player_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Player1"
-            android:textColor="#ffffff" />
-
-        <Button
-            android:id="@+id/button_player_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="OK" />
-
-    </LinearLayout>
+        android:layout_marginLeft="24dp"
+        fbutton:buttonColor="@color/fbutton_color_sun_flower"
+        fbutton:cornerRadius="5dp"
+        fbutton:shadowColor="@color/fbutton_color_orange"
+        fbutton:shadowEnabled="true"
+        fbutton:shadowHeight="5dp" />
 
     <TextView
         android:id="@+id/main_label"
@@ -55,21 +33,9 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:text="Badam Satti"
+        android:text="@string/string_title_main_board"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:textSize="60dp" />
-
-    <TextView
-        android:id="@+id/play_label"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_marginLeft="10dp"
-        android:layout_toEndOf="@+id/button_play_game"
-        android:layout_toRightOf="@+id/button_play_game"
-        android:text="Play"
-        android:textColor="@android:color/white"
-        android:textSize="24dp" />
 
 
 </RelativeLayout>

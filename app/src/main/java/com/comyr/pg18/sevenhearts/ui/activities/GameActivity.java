@@ -1,8 +1,18 @@
 package com.comyr.pg18.sevenhearts.ui.activities;
 
+import android.app.Dialog;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.Gravity;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.comyr.pg18.sevenhearts.R;
@@ -19,9 +29,16 @@ import com.comyr.pg18.sevenhearts.ui.utils.FontUtils;
 import com.comyr.pg18.sevenhearts.ui.utils.helper.ActivityOptionHelper;
 import com.comyr.pg18.sevenhearts.ui.views.CardView;
 import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
+import com.comyr.pg18.sevenhearts.ui.views.ScoreCardRow;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+
+import info.hoang8f.widget.FButton;
 
 public class GameActivity extends CustomActivity {
     /**
@@ -32,6 +49,7 @@ public class GameActivity extends CustomActivity {
      * main {@link GameThread} object
      */
     private static GameThread thread;
+
     private final String TAG = "GameActivity";
     /**
      * holds players registered with current table. Refer : {@link Player}
@@ -49,11 +67,19 @@ public class GameActivity extends CustomActivity {
      * cards of the human player
      */
     private ArrayList<Card> thisPlayerCards;
-
-    // UI
+    /**
+     * cards in player's hands are arranged in this layout. Refer : {@link CardView} for details
+     */
     private LinearLayout playerCardsLayout;
+    /**
+     * player views are arranged in player layout. Refer : {@link PlayerView}
+     */
     private LinearLayout playersLayout;
+    /**
+     * this text view displays everything related to game
+     */
     private TextView mainDisplayTextView;
+
     private GameActivity gameActivity;
     /**
      * cards when played, are placed on table. Table has different {@link CardView} objects to show cards on table.
@@ -148,6 +174,9 @@ public class GameActivity extends CustomActivity {
      * @return {@link PlayerView} object.  Null, if {@link PlayerView} is not found
      */
     public PlayerView getViewForPlayer(Player player) {
+        if(player == null) {
+            return null;
+        }
         for (int i = 0; i < playersLayout.getChildCount(); i++) {
             PlayerView pv = (PlayerView) playersLayout.getChildAt(i);
             if (pv.getPlayer().equals(player)) {
@@ -162,7 +191,7 @@ public class GameActivity extends CustomActivity {
      *
      * @param name of the player for which {@link Player} object is to be returned
      * @return player object
-     * @throws PlayerNotFoundException if given {@link Player} is not registered with current instance of {@link table}
+     * @throws PlayerNotFoundException if given {@link Player} is not registered with current instance of {@link Table}
      */
     public Player getPlayerForName(String name) throws PlayerNotFoundException {
         Iterator<Player> it = players.iterator();
@@ -261,12 +290,104 @@ public class GameActivity extends CustomActivity {
         table = null;
         thisPlayer = null;
         thisPlayerCards = null;
-        gameActivity = null;
         thread = null;
         /**
          * reload player avatars to ensure unique drawables
          */
         PlayerView.reloadDrawables();
+    }
+
+    /**
+     * restarts the game
+     */
+    public void restartGame() {
+        mAnalytics.trackAction(MixPanel.ACTION_GAME_RESTART);
+        thread.kill();
+        reset();
+        resetViews();
+        gameInitTask = new GameInitTask(gameActivity);
+        gameInitTask.execute();
+    }
+
+    /**
+     * Shows a score card along with an option to restart and exit
+     * For restart, @see #restartGame for implementation of restart
+     */
+    public void showScoreCard() {
+        final Dialog dialog = new Dialog(this);
+        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(R.layout.layout_scorecard);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        dialog.setCancelable(false);
+        LinearLayout linearLayout = (LinearLayout) dialog.findViewById(R.id.container_player_scores);
+        ((TextView) dialog.findViewById(R.id.title_scorecard)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_RIGHTEOUS));
+        Collections.sort(players, new Comparator<Player>() {
+            @Override
+            public int compare(Player lhs, Player rhs) {
+                if (lhs.getScore() > rhs.getScore()) return -1;
+                else if (lhs.getScore() < rhs.getScore()) return 1;
+                else return 0;
+            }
+        });
+        int i = 0;
+        for (Player p : players) {
+            if(i == 0) mAnalytics.trackAction(MixPanel.ACTION_HIGHEST_SCORE, MixPanel.TAG_SCORE, String.valueOf(p.getScore()));
+            ScoreCardRow row = new ScoreCardRow(this).forPlayer(p).init();
+            linearLayout.addView(row);
+            i++;
+        }
+        ((FButton) dialog.findViewById(R.id.button_restart_game)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                restartGame();
+            }
+        });
+        ((FButton) dialog.findViewById(R.id.button_exit_game)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+                mAnalytics.trackAction(MixPanel.ACTION_GAME_EXIT);
+                thread.kill();
+                reset();
+                finish();
+            }
+        });
+        dialog.show();
+    }
+
+    /**
+     * Before restarting game, all the views need to be reset.
+     * This method removes all views that are related to the game.
+     */
+    public void resetViews() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                playersLayout.removeAllViews();
+                playerCardsLayout.removeAllViews();
+                removeCardViewsFromTable(heartsUpperCard, heartsLowerCard, spadesUpperCard, spadesLowerCard, diamondsLowerCard, diamondsUpperCard, clubsLowerCard, clubsUpperCard);
+                mainDisplayTextView.setText(getString(R.string.text_welcome));
+            }
+        });
+    }
+
+    /**
+     * Removes cards placed on the table. After call to this method,
+     * all the cards in player's hands and cards on the table are
+     * removed from their respective parent views.
+     * @param views An array of {@link CardView} objects that hold
+     *              the cards placed on the table.
+     */
+    public void removeCardViewsFromTable(CardView... views) {
+        for(final CardView v : views) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    v.setBackgroundColor(Color.parseColor("#00000000"));
+                }
+            });
+        }
     }
 }
 

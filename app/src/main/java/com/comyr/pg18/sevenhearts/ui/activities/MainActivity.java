@@ -15,14 +15,12 @@ import com.comyr.pg18.sevenhearts.ui.utils.FontUtils;
 import com.comyr.pg18.sevenhearts.ui.utils.GameData;
 import com.comyr.pg18.sevenhearts.ui.utils.helper.ActivityOptionHelper;
 
-import at.markushi.ui.CircleButton;
+import info.hoang8f.widget.FButton;
 
 public class MainActivity extends CustomActivity {
     private final String TAG = "MainActivity";
 
-    private Button playerNameButton;
-    private EditText playerNameEditText;
-    private CircleButton startGameButton;
+    private FButton startGameButton;
     private TextView mainLabelTextView;
     private MainActivity mainActivity;
 
@@ -38,18 +36,6 @@ public class MainActivity extends CustomActivity {
 
         initUI();
 
-        playerNameButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String playerName = playerNameEditText.getText().toString();
-                if (playerName == null) playerName = "Player1";
-                else if (playerName.equals("")) playerName = "Player1";
-                else {
-                    GameData.thisPlayerName = playerName;
-                }
-            }
-        });
-
         startGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,18 +43,14 @@ public class MainActivity extends CustomActivity {
                 startActivity(i);
             }
         });
-
     }
 
     @Override
     protected void initUI() {
         super.initUI();
-        playerNameButton = (Button) findViewById(R.id.button_player_name);
-        playerNameEditText = (EditText) findViewById(R.id.edit_text_player_name);
-        startGameButton = (CircleButton) findViewById(R.id.button_play_game);
+        startGameButton = (FButton) findViewById(R.id.button_play_game);
         mainLabelTextView = (TextView) findViewById(R.id.main_label);
         mainLabelTextView.setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CARTWHEEL));
-        ((TextView) findViewById(R.id.play_label)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CARTWHEEL));
         String mainTitle = "<font color=\"#F64A8A\">BADAM</font> <font color=\"#FFFFFF\">SATTI</font>";
         mainLabelTextView.setText(Html.fromHtml(mainTitle));
     }

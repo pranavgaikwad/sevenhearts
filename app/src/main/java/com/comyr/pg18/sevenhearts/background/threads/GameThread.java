@@ -1,6 +1,7 @@
 package com.comyr.pg18.sevenhearts.background.threads;
 
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 
 import com.comyr.pg18.sevenhearts.game.resources.Card;
@@ -19,27 +20,31 @@ import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
  */
 public class GameThread implements Runnable {
     /**
-     * used as a lock on @see GameThread#currentMove
-     * avoids concurrent update of #currentMove
-     * #currentMove is updated from UI thread and background thread as well
-     */
-    private static final Object lock = new Object();
-    /**
      * termination condition for game loop
      */
-    public static boolean isFinished = false;
-    /**
-     * current player who will play current move
-     */
-    public static Player currentPlayer;
-    /**
-     * used as a lock on #ct to avoid concurrent manipulation
-     */
-    private final Object moveLock = new Object();
+    public boolean isFinished = false;
     /**
      * stores card that human player clicks
      */
     private Card currentMove;
+    /**
+     * used as a lock on @see GameThread#currentMove
+     * avoids concurrent update of #currentMove
+     * #currentMove is updated from UI thread and background thread as well
+     */
+    private final Object lock = new Object();
+    /**
+     * current player who will play current move
+     */
+    public Player currentPlayer;
+    /**
+     * lock on current player
+     */
+    public final Object cpLock = new Object();
+    /**
+     * used as a lock on #ct to avoid concurrent manipulation
+     */
+    private final Object moveLock = new Object();
     /**
      * game thread object
      */
@@ -82,7 +87,7 @@ public class GameThread implements Runnable {
         try {
             while (!isFinished) {// Let the thread sleep for a while.
                 Thread.sleep(1000);
-                synchronized (currentPlayer) {
+                synchronized (cpLock) {
                     currentPlayer = table.getCurrentPlayer();
                 }
                 if (currentPlayer.equals(activity.getThisPlayer())) {
@@ -151,7 +156,7 @@ public class GameThread implements Runnable {
                         activity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                synchronized (currentPlayer) {
+                                synchronized (cpLock) {
                                     currentMove = currentPlayer.playCard(ct);
                                 }
                             }
@@ -215,11 +220,11 @@ public class GameThread implements Runnable {
      * kills the thread
      */
     public void kill() {
+        thread.interrupt();
+        currentMove = null;
+        thread = null;
         cnt = 0;
         currentPlayer = null;
-        currentMove = null;
-        thread.interrupt();
-        thread = null;
     }
 
     /**
@@ -274,7 +279,7 @@ public class GameThread implements Runnable {
                     final String msg = currentPlayer.getName() + " is thinking";
                     activity.getMainDisplayTextView().setText(Html.fromHtml(msg));
                     pv.setCurrentPlayer();
-                    GameActivity.getThread().resume();
+                    if(GameActivity.getThread() != null) GameActivity.getThread().resume();
                 } else {
                     final String msg = "<font color=\"#ffff00\">Your move...</font>";
                     activity.getMainDisplayTextView().setText(Html.fromHtml(msg));
@@ -282,7 +287,7 @@ public class GameThread implements Runnable {
                         SysUtils.vibrate(activity);
                         SysUtils.playUserMoveSound(activity);
                     }
-                    GameActivity.getThread().resume();
+                    if(GameActivity.getThread() != null) GameActivity.getThread().resume();
                     cnt++;
                 }
             }
@@ -297,7 +302,7 @@ public class GameThread implements Runnable {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                String msg = currentPlayer.getName() + " passed current move ";
+                String msg = currentPlayer.getName() + " passed current move";
                 activity.getMainDisplayTextView().setText(msg);
                 PlayerView pv = activity.getViewForPlayer(currentPlayer);
                 if (pv != null) {
@@ -306,7 +311,7 @@ public class GameThread implements Runnable {
                 } else {
                     msg = currentPlayer.getName() + " passed this move";
                     activity.getMainDisplayTextView().setText(msg);
-                    GameActivity.getThread().resume();
+                    if(GameActivity.getThread() != null) GameActivity.getThread().resume();
                 }
             }
         });
@@ -327,7 +332,7 @@ public class GameThread implements Runnable {
                 if (pv != null) {
                     pv.removeCurrentPlayer();
                 }
-                GameActivity.getThread().resume();
+                if(GameActivity.getThread() != null) GameActivity.getThread().resume();
             }
         });
     }
@@ -345,7 +350,7 @@ public class GameThread implements Runnable {
                     cv.setCard(ct, true);
                     cv.setVisibility(View.VISIBLE);
                 }
-                GameActivity.getThread().resume();
+                if(GameActivity.getThread() != null) GameActivity.getThread().resume();
             }
         });
     }

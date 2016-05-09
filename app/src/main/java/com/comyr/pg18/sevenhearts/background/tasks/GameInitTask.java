@@ -31,7 +31,6 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
     @Override
     protected String doInBackground(String... params) {
         initGameResources();
-
         return null;
     }
 
@@ -57,7 +56,6 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
      * initiates an empty {@link Table} with 4 {@link Player} objects with default {@link GameData}
      */
     private void initTable() {
-        gameActivity.setTable(null);
         GameData.initData();
         String p2 = GameData.getRandomPlayerName();
         String p3 = GameData.getRandomPlayerName();

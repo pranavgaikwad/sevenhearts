@@ -19,6 +19,10 @@ public class FontUtils {
      * used as main base font to draw text
      */
     public static final int FONT_CARTWHEEL = 1;
+    /**
+     * used on scorecard
+     */
+    public static final int FONT_RIGHTEOUS = 2;
 
     private static final LruCache<String, SoftReference<Typeface>> mTypefaceCache;
 
@@ -46,6 +50,10 @@ public class FontUtils {
 
             case FONT_CARTWHEEL:
                 typefaceName = "cartwheel.ttf";
+                break;
+
+            case FONT_RIGHTEOUS:
+                typefaceName = "righteous.ttf";
                 break;
         }
 

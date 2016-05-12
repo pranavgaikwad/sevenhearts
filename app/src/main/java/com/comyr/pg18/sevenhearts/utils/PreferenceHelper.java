@@ -3,6 +3,8 @@ package com.comyr.pg18.sevenhearts.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.comyr.pg18.sevenhearts.utils.listeners.OnGameSettingsAlteredListener;
+
 /**
  * Created by pranav on 5/10/16.
  * On 10:09 AM
@@ -23,6 +25,10 @@ public class PreferenceHelper {
      * Static instance of the helper class
      */
     private static PreferenceHelper instance = null;
+    /**
+     * Used to broadcast game state changes
+     */
+    private OnGameSettingsAlteredListener l = null;
 
     public static final String KEY_SETTINGS_VIBRATE = "s_vb";
     public static final String KEY_SETTINGS_VOLUME  = "s_vm";
@@ -52,6 +58,7 @@ public class PreferenceHelper {
         SharedPreferences.Editor e = prefs.edit();
         e.putString(key, val);
         e.commit();
+        updateListener(key);
     }
     /**
      * Writes given integer value along with the specified key to the shared preference.
@@ -62,6 +69,7 @@ public class PreferenceHelper {
         SharedPreferences.Editor e = prefs.edit();
         e.putInt(key, val);
         e.commit();
+        updateListener(key);
     }
     /**
      * Writes given boolean value along with the specified key to the shared preference.
@@ -72,6 +80,28 @@ public class PreferenceHelper {
         SharedPreferences.Editor e = prefs.edit();
         e.putBoolean(key, val);
         e.commit();
+        updateListener(key);
+    }
+    /**
+     * Broadcasts changed value according to provided key
+     * @param key Key for which value is changed
+     */
+    public void updateListener(String key) {
+        if(l != null) {
+            switch (key) {
+                case KEY_SETTINGS_VOLUME:
+                    l.onMusicAltered();
+                    break;
+            }
+        }
+    }
+
+    /**
+     * Game settings altered listener takes care of the volume and vibrate
+     * settings change.
+     */
+    public void setOnGameSettingsAlteredListener(OnGameSettingsAlteredListener l) {
+        this.l = l;
     }
     /**
      * This method is generalized for retrieving value from the

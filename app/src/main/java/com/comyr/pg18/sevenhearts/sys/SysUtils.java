@@ -9,6 +9,7 @@ import android.os.Vibrator;
 
 import com.comyr.pg18.sevenhearts.R;
 import com.comyr.pg18.sevenhearts.utils.PreferenceHelper;
+import com.comyr.pg18.sevenhearts.utils.listeners.OnGameSettingsAlteredListener;
 
 import java.security.Permission;
 
@@ -16,11 +17,66 @@ import java.security.Permission;
  * Created by pranav on 5/8/16.
  * On 2:45 PM
  */
-public class SysUtils {
+public class SysUtils{
+    /**
+     * Context
+     */
+    private Context context;
     /**
      * default vibrate time
      */
     public static int DEFAULT_VIBRATE = 400;
+    /**
+     * Media player for background music
+     */
+    private MediaPlayer mp = null;
+    /**
+     * Instance to keep the class singleton
+     */
+    private static SysUtils instance = null;
+    /**
+     * Returns the static instance of the class
+     * @return {@link #instance}
+     */
+    public static SysUtils getInstance() {
+        if(instance == null) {
+            instance = new SysUtils();
+        }
+        return instance;
+    }
+    /**
+     * Initiates the media player for given background music
+     * @param context Activity context for player
+     */
+    public void initPlayer(Context context) {
+        this.context = context;
+        mp = MediaPlayer.create(context, R.raw.intro);
+        mp.setLooping(true);
+    }
+    /**
+     * Starts the bg music
+     */
+    public void startPlayer() {
+        mp.start();
+    }
+    /**
+     * Pauses the bg music
+     */
+    public void pausePlayer() {
+        mp.pause();
+    }
+    /**
+     * Stops the bg music
+     */
+    public void stopPlayer() {
+        mp.stop();
+    }
+    /**
+     * Resumes the bg music
+     */
+    public void resumePlayer() {
+        mp.start();
+    }
     /**
      * vibrates the device for given time
      * @param mil time in milliseconds to vibrate

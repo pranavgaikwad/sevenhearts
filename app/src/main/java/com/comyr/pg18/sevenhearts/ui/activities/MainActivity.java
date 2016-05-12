@@ -10,13 +10,16 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.comyr.pg18.sevenhearts.R;
+import com.comyr.pg18.sevenhearts.background.tasks.BackgroundMusicTask;
 import com.comyr.pg18.sevenhearts.network.analytics.MixPanel;
+import com.comyr.pg18.sevenhearts.sys.SysUtils;
 import com.comyr.pg18.sevenhearts.ui.activities.base.CustomActivity;
 import com.comyr.pg18.sevenhearts.ui.utils.FontUtils;
 import com.comyr.pg18.sevenhearts.ui.utils.helper.ActivityOptionHelper;
 import com.comyr.pg18.sevenhearts.utils.PreferenceHelper;
+import com.comyr.pg18.sevenhearts.utils.listeners.OnGameSettingsAlteredListener;
 
-public class MainActivity extends CustomActivity {
+public class MainActivity extends CustomActivity implements OnGameSettingsAlteredListener{
     private final String TAG = "MainActivity";
 
     private Button startGameButton, statsButton;
@@ -24,12 +27,17 @@ public class MainActivity extends CustomActivity {
     private ImageView vibrateButton, volumeButton;
     private int c1, c2;
     private TextView mainTitleTextView;
+    private BackgroundMusicTask bgm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.setOptions(ActivityOptionHelper.getOptionsForActivity(ActivityOptionHelper.ACTIVITY_MAIN));
         setContentView(R.layout.activity_main);
+
+        PreferenceHelper.getInstance(this).setOnGameSettingsAlteredListener(this);
+
+        playMusic();
 
         mAnalytics.trackAction(MixPanel.ACTION_ACTIVITY_OPEN, MixPanel.TAG_ACTIVITY, TAG);
 
@@ -45,6 +53,29 @@ public class MainActivity extends CustomActivity {
                 startActivity(i);
             }
         });
+    }
+
+    private void playMusic() {
+        SysUtils.getInstance().initPlayer(this);
+        SysUtils.getInstance().startPlayer();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SysUtils.getInstance().resumePlayer();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        SysUtils.getInstance().pausePlayer();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SysUtils.getInstance().stopPlayer();
     }
 
     @Override
@@ -94,5 +125,16 @@ public class MainActivity extends CustomActivity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onMusicAltered() {
+        boolean b = PreferenceHelper.getInstance(this).rb(PreferenceHelper.KEY_SETTINGS_VOLUME);
+        if(b) {
+            SysUtils.getInstance().initPlayer(this);
+            SysUtils.getInstance().startPlayer();
+        } else {
+            SysUtils.getInstance().stopPlayer();
+        }
     }
 }

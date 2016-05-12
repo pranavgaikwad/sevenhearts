@@ -1,18 +1,15 @@
 package com.comyr.pg18.sevenhearts.ui.activities;
 
+import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.comyr.pg18.sevenhearts.R;
@@ -31,12 +28,11 @@ import com.comyr.pg18.sevenhearts.ui.views.CardView;
 import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
 import com.comyr.pg18.sevenhearts.ui.views.ScoreCardRow;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Random;
 
 import info.hoang8f.widget.FButton;
 
@@ -79,6 +75,10 @@ public class GameActivity extends CustomActivity {
      * this text view displays everything related to game
      */
     private TextView mainDisplayTextView;
+    /**
+     * table background is generated randomly from below given drawables
+     */
+    private final int[] tableBgIds = {R.drawable.table_blue, R.drawable.table_orange, R.drawable.table_purple, R.drawable.table_sky, R.drawable.table_teal, R.drawable.table_yellow};
 
     private GameActivity gameActivity;
     /**
@@ -212,10 +212,10 @@ public class GameActivity extends CustomActivity {
         playersLayout = (LinearLayout) findViewById(R.id.linear_layout_players);
         mainDisplayTextView = (TextView) findViewById(R.id.text_view_main_display);
         mainDisplayTextView.setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_ELECTRONIC));
-        ((TextView) findViewById(R.id.label_clubs_container)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CARTWHEEL));
-        ((TextView) findViewById(R.id.label_diamonds_container)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CARTWHEEL));
-        ((TextView) findViewById(R.id.label_hearts_container)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CARTWHEEL));
-        ((TextView) findViewById(R.id.label_spades_container)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CARTWHEEL));
+        ((TextView) findViewById(R.id.label_clubs_container)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CHAU));
+        ((TextView) findViewById(R.id.label_diamonds_container)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CHAU));
+        ((TextView) findViewById(R.id.label_hearts_container)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CHAU));
+        ((TextView) findViewById(R.id.label_spades_container)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_CHAU));
         heartsUpperCard = (CardView) findViewById(R.id.hearts_upper_card);
         heartsLowerCard = (CardView) findViewById(R.id.hearts_lower_card);
         diamondsUpperCard = (CardView) findViewById(R.id.diamonds_upper_card);
@@ -224,6 +224,35 @@ public class GameActivity extends CustomActivity {
         clubsLowerCard = (CardView) findViewById(R.id.clubs_lower_card);
         spadesUpperCard = (CardView) findViewById(R.id.spades_upper_card);
         spadesLowerCard = (CardView) findViewById(R.id.spades_lower_card);
+        setRandomBackground();
+    }
+
+    /**
+     * Sets a random table background
+     */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    private void setRandomBackground() {
+        final int sdk = android.os.Build.VERSION.SDK_INT;
+        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            findViewById(R.id.base_layout_game_activity).setBackgroundDrawable( getResources().getDrawable(getRandomTableBackgroundId()) );
+        } else {
+            findViewById(R.id.base_layout_game_activity).setBackground( getResources().getDrawable(getRandomTableBackgroundId()));
+        }
+    }
+
+    /**
+     * Generates a random drawable id from available table background drawables.
+     * The list of drawables is maintained by {@link GameActivity#tableBgIds}
+     * @return Drawable id for table background
+     * @see GameActivity#tableBgIds
+     */
+    private int getRandomTableBackgroundId() {
+        int max = tableBgIds.length;
+        int min = 0;
+        Random r = new Random(System.nanoTime());
+        int p = r.nextInt(max - min) + min;
+        if(p < tableBgIds.length) return tableBgIds[p];
+        else return tableBgIds[0];
     }
 
     /**
@@ -320,7 +349,7 @@ public class GameActivity extends CustomActivity {
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         dialog.setCancelable(false);
         LinearLayout linearLayout = (LinearLayout) dialog.findViewById(R.id.container_player_scores);
-        ((TextView) dialog.findViewById(R.id.title_scorecard)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_RIGHTEOUS));
+        ((TextView) dialog.findViewById(R.id.title_scorecard)).setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_HELVETICA));
         Collections.sort(players, new Comparator<Player>() {
             @Override
             public int compare(Player lhs, Player rhs) {

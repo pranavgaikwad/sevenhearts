@@ -12,5 +12,8 @@
     <string name="text_welcome">Welcome to Badam Satti !</string>
     <string name="text_play_button">Play</string>
     <string name="text_restart_button">Restart</string>
+    <string name="text_stats_button">Stats</string>
     <string name="text_exit_button">Exit</string>
+
+    <string name="icon_fa_play">&#xf04b;</string>
 </resources>

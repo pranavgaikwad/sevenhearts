@@ -2,6 +2,7 @@ package com.comyr.pg18.sevenhearts.ui.views;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Build;
 import android.text.Html;
 import android.util.AttributeSet;
@@ -28,7 +29,7 @@ import java.util.Stack;
 public class PlayerView extends LinearLayout {
     private static final String COLOR_BLUE = "#0000ff";
     private static final String COLOR_YELLOW = "#ffff00";
-    private static final String COLOR_WHITE = "#ffffff";
+    private static final String COLOR_WHITE = "#c5c5c5";
 
     /**
      * stores drawables of player avatars. These
@@ -96,15 +97,27 @@ public class PlayerView extends LinearLayout {
     /**
      * highlights the background of current view with given background color.
      */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void setCurrentPlayer() {
-        setBackgroundColor(getResources().getColor(R.color.current_player_background_color));
+        final int sdk = android.os.Build.VERSION.SDK_INT;
+        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            setBackgroundDrawable(getResources().getDrawable(R.drawable.drawable_bg_player_view_focussed) );
+        } else {
+            setBackground(getResources().getDrawable(R.drawable.drawable_bg_player_view_focussed));
+        }
     }
 
     /**
      * un-highlights the background of the player view
      */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     public void removeCurrentPlayer() {
-        setBackgroundColor(getResources().getColor(R.color.transparent));
+        final int sdk = android.os.Build.VERSION.SDK_INT;
+        if(sdk < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+            setBackgroundDrawable(getResources().getDrawable(R.drawable.drawable_bg_player_view_normal) );
+        } else {
+            setBackground( getResources().getDrawable(R.drawable.drawable_bg_player_view_normal));
+        }
     }
 
     /**
@@ -155,23 +168,28 @@ public class PlayerView extends LinearLayout {
     public void setPlayer(Player player) {
         this.player = player;
         setOrientation(VERTICAL);
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER_HORIZONTAL);
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.gravity = Gravity.CENTER_HORIZONTAL;
+        layoutParams.setMargins(0, 0, 0, 4);
+        setPadding(2, 2, 2, 2);
         setLayoutParams(layoutParams);
         ResolutionHelper.getInstance().loadScreenResolution(getContext());
         CustomResolution res = ResolutionHelper.getInstance().getResolutionForView(ResolutionHelper.VIEW_PLAYER);
         imageView = new ImageView(getContext());
         imageView.setImageResource(getRandomUserImageDrawable());
         LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(res.getHeight(), res.getHeight(), Gravity.CENTER_HORIZONTAL);
-        imageParams.setMargins(0, 3, 0, 3);
+        imageParams.setMargins(0, 2, 0, 2);
         imageView.setLayoutParams(imageParams);
         textView = new TextView(getContext());
-        textView.setTypeface(FontUtils.getTypeface(getContext(), FontUtils.FONT_CARTWHEEL));
-        textView.setTextColor(getResources().getColor(R.color.white));
+        textView.setTypeface(FontUtils.getTypeface(getContext(), FontUtils.FONT_CHAU));
+        textView.setTextColor(Color.parseColor(COLOR_WHITE));
         textView.setText(player.getName() + "(" + String.valueOf(player.getCards().size()) + ")");
         LinearLayout.LayoutParams textParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        textParams.setMargins(0, 3, 0, 3);
+        textParams.setMargins(0, 2, 0, 2);
+        textParams.gravity = Gravity.CENTER_HORIZONTAL;
         textView.setLayoutParams(textParams);
         addView(imageView);
         addView(textView);
+        removeCurrentPlayer();
     }
 }

@@ -55,7 +55,7 @@ public class MixPanel {
      * @param action @see MixPanel for action constants
      */
     public void trackAction(String action) {
-        if(BuildConfig.DEBUG) {
+        if(!BuildConfig.DEBUG) {
             api.track(action);
         }
     }
@@ -66,7 +66,7 @@ public class MixPanel {
      * @param payload json payload
      */
     public void trackAction(String action, JSONObject payload) {
-        if(BuildConfig.DEBUG) {
+        if(!BuildConfig.DEBUG) {
             api.track(action, payload);
         }
     }

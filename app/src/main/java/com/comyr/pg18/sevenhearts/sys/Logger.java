@@ -1,4 +1,4 @@
-package com.comyr.pg18.sevenhearts.ui.sys;
+package com.comyr.pg18.sevenhearts.sys;
 
 import android.util.Log;
 

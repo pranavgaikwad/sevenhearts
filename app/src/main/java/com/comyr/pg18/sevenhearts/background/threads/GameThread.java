@@ -1,7 +1,6 @@
 package com.comyr.pg18.sevenhearts.background.threads;
 
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 
 import com.comyr.pg18.sevenhearts.game.resources.Card;
@@ -10,7 +9,7 @@ import com.comyr.pg18.sevenhearts.game.resources.Table;
 import com.comyr.pg18.sevenhearts.game.solution.Solver;
 import com.comyr.pg18.sevenhearts.network.analytics.MixPanel;
 import com.comyr.pg18.sevenhearts.ui.activities.GameActivity;
-import com.comyr.pg18.sevenhearts.ui.sys.SysUtils;
+import com.comyr.pg18.sevenhearts.sys.SysUtils;
 import com.comyr.pg18.sevenhearts.ui.views.CardView;
 import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
 

@@ -18,11 +18,15 @@ public class FontUtils {
     /**
      * used as main base font to draw text
      */
-    public static final int FONT_CARTWHEEL = 1;
+    public static final int FONT_CHAU = 1;
     /**
      * used on scorecard
      */
-    public static final int FONT_RIGHTEOUS = 2;
+    public static final int FONT_HELVETICA = 2;
+    /**
+     * used on main title
+     */
+    public static final int FONT_LETTERS = 3;
 
     private static final LruCache<String, SoftReference<Typeface>> mTypefaceCache;
 
@@ -48,12 +52,16 @@ public class FontUtils {
                 typefaceName = "electronic.ttf";
                 break;
 
-            case FONT_CARTWHEEL:
-                typefaceName = "cartwheel.ttf";
+            case FONT_CHAU:
+                typefaceName = "chau-philomene-one.ttf";
                 break;
 
-            case FONT_RIGHTEOUS:
-                typefaceName = "righteous.ttf";
+            case FONT_HELVETICA:
+                typefaceName = "helvetica.ttf";
+                break;
+
+            case FONT_LETTERS:
+                typefaceName = "l-letters.ttf";
                 break;
         }
 

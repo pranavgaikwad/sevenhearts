@@ -1,12 +1,14 @@
-package com.comyr.pg18.sevenhearts.ui.sys;
+package com.comyr.pg18.sevenhearts.sys;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionInfo;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Vibrator;
 
 import com.comyr.pg18.sevenhearts.R;
+import com.comyr.pg18.sevenhearts.utils.PreferenceHelper;
 
 import java.security.Permission;
 
@@ -24,8 +26,11 @@ public class SysUtils {
      * @param mil time in milliseconds to vibrate
      */
     public static void vibrate(Context context, int mil) {
-        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-        vibrator.vibrate(mil);
+        boolean b = PreferenceHelper.getInstance(context).rb(PreferenceHelper.KEY_SETTINGS_VIBRATE, true);
+        if(b) {
+            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            vibrator.vibrate(mil);
+        }
     }
     /**
      * vibrates the device for default time
@@ -40,8 +45,11 @@ public class SysUtils {
      * this method plays a sound notifying user that it's their turn to play
      */
     public static void playUserMoveSound(Context context) {
-        final MediaPlayer mp = MediaPlayer.create(context, R.raw.notification);
-        mp.start();
+        boolean b = PreferenceHelper.getInstance(context).rb(PreferenceHelper.KEY_SETTINGS_VOLUME, true);
+        if(b) {
+            final MediaPlayer mp = MediaPlayer.create(context, R.raw.notification);
+            mp.start();
+        }
     }
     /**
      * checks if vibration is permitted by the user

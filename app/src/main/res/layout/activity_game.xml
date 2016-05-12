@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/base_layout_game_activity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/ic_table_bg"
     tools:context="com.comyr.pg18.sevenhearts.ui.activities.GameActivity">
 
     <LinearLayout
@@ -45,7 +45,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:background="@android:color/black"
+                android:background="@drawable/drawable_bg_led"
                 android:gravity="center"
                 android:padding="2dp"
                 android:text="@string/text_welcome"

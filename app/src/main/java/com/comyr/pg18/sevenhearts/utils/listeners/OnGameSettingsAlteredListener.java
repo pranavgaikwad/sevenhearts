@@ -5,5 +5,5 @@ package com.comyr.pg18.sevenhearts.utils.listeners;
  * On 12:40 PM
  */
 public interface OnGameSettingsAlteredListener {
-    void onMusicAltered();
+    void onMusicSettingsAltered();
 }

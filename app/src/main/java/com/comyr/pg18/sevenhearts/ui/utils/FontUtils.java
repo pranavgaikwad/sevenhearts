@@ -26,7 +26,7 @@ public class FontUtils {
     /**
      * used on main title
      */
-    public static final int FONT_LETTERS = 3;
+    public static final int FONT_SATTI = 3;
 
     private static final LruCache<String, SoftReference<Typeface>> mTypefaceCache;
 
@@ -60,8 +60,8 @@ public class FontUtils {
                 typefaceName = "helvetica.ttf";
                 break;
 
-            case FONT_LETTERS:
-                typefaceName = "l-letters.ttf";
+            case FONT_SATTI:
+                typefaceName = "b-satti.ttf";
                 break;
         }
 

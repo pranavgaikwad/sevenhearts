@@ -1,18 +1,15 @@
 package com.comyr.pg18.sevenhearts.ui.activities;
 
 import android.content.Intent;
-import android.graphics.Typeface;
+import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.text.Html;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.comyr.pg18.sevenhearts.R;
-import com.comyr.pg18.sevenhearts.background.tasks.BackgroundMusicTask;
 import com.comyr.pg18.sevenhearts.network.analytics.MixPanel;
-import com.comyr.pg18.sevenhearts.sys.SysUtils;
 import com.comyr.pg18.sevenhearts.ui.activities.base.CustomActivity;
 import com.comyr.pg18.sevenhearts.ui.utils.FontUtils;
 import com.comyr.pg18.sevenhearts.ui.utils.helper.ActivityOptionHelper;
@@ -20,14 +17,38 @@ import com.comyr.pg18.sevenhearts.utils.PreferenceHelper;
 import com.comyr.pg18.sevenhearts.utils.listeners.OnGameSettingsAlteredListener;
 
 public class MainActivity extends CustomActivity implements OnGameSettingsAlteredListener{
+    /**
+     * Debug tag
+     */
     private final String TAG = "MainActivity";
-
+    /**
+     * Buttons on the main screen
+     */
     private Button startGameButton, statsButton;
+    /**
+     * Activity instance
+     */
     private MainActivity mainActivity;
+    /**
+     * Settings buttons
+     */
     private ImageView vibrateButton, volumeButton;
-    private int c1, c2;
+    /**
+     * Workaround for making image views to work like toggle buttons (For settings buttons)
+     */
+    private int c1 = 1, c2 = 1;
+    /**
+     * Main game title board
+     */
     private TextView mainTitleTextView;
-    private BackgroundMusicTask bgm;
+    /**
+     * Media player to play music file in background
+     */
+    private MediaPlayer mp = null;
+    /**
+     * Initially, volume and vibrate settings are to be checked before starting media player
+     */
+    private boolean isVolumeOn, isVibrateOn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +58,13 @@ public class MainActivity extends CustomActivity implements OnGameSettingsAltere
 
         PreferenceHelper.getInstance(this).setOnGameSettingsAlteredListener(this);
 
-        playMusic();
-
         mAnalytics.trackAction(MixPanel.ACTION_ACTIVITY_OPEN, MixPanel.TAG_ACTIVITY, TAG);
 
         mainActivity = this;
 
         initUI();
+
+        playMusic();
 
         startGameButton.setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_HELVETICA));
         startGameButton.setOnClickListener(new View.OnClickListener() {
@@ -56,26 +77,27 @@ public class MainActivity extends CustomActivity implements OnGameSettingsAltere
     }
 
     private void playMusic() {
-        SysUtils.getInstance().initPlayer(this);
-        SysUtils.getInstance().startPlayer();
+        mp = MediaPlayer.create(this, R.raw.intro);
+        mp.setLooping(true);
+        if (isVolumeOn) mp.start();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        SysUtils.getInstance().resumePlayer();
+        if (isVolumeOn) mp.start();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        SysUtils.getInstance().pausePlayer();
+        mp.pause();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SysUtils.getInstance().stopPlayer();
+        mp.stop();
     }
 
     @Override
@@ -87,14 +109,12 @@ public class MainActivity extends CustomActivity implements OnGameSettingsAltere
         statsButton.setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_HELVETICA));
         vibrateButton = (ImageView) findViewById(R.id.toggle_button_vibrate);
         volumeButton = (ImageView) findViewById(R.id.toggle_button_volume);
-        boolean isVolumeOn = PreferenceHelper.getInstance(this).rb(PreferenceHelper.KEY_SETTINGS_VOLUME, true);
-        boolean isVibrateOn = PreferenceHelper.getInstance(this).rb(PreferenceHelper.KEY_SETTINGS_VIBRATE, true);
+        isVolumeOn = PreferenceHelper.getInstance(this).rb(PreferenceHelper.KEY_SETTINGS_VOLUME, true);
+        isVibrateOn = PreferenceHelper.getInstance(this).rb(PreferenceHelper.KEY_SETTINGS_VIBRATE, true);
         mainTitleTextView = (TextView) findViewById(R.id.text_view_main_title);
-        mainTitleTextView.setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_LETTERS));
-        String title = "<font color=\"#E0E0E0\">Badam</font>" + "\n" + " <font color=\"#E0E0E0\">Satti</font>";
-        mainTitleTextView.setText(Html.fromHtml(title));
-        c1 = 1;
-        c2 = 1;
+        mainTitleTextView.setTypeface(FontUtils.getTypeface(this, FontUtils.FONT_SATTI));
+        String title = "Badam" + "\n" + " Satti";
+        mainTitleTextView.setText(title);
         if(!isVolumeOn)  { volumeButton.setImageResource(R.drawable.ic_volume_off); c1 = 0;}
         if(!isVibrateOn) { vibrateButton.setImageResource(R.drawable.ic_vibrate_off); c2 = 0; }
         volumeButton.setOnClickListener(new View.OnClickListener() {
@@ -128,13 +148,14 @@ public class MainActivity extends CustomActivity implements OnGameSettingsAltere
     }
 
     @Override
-    public void onMusicAltered() {
+    public void onMusicSettingsAltered() {
         boolean b = PreferenceHelper.getInstance(this).rb(PreferenceHelper.KEY_SETTINGS_VOLUME);
         if(b) {
-            SysUtils.getInstance().initPlayer(this);
-            SysUtils.getInstance().startPlayer();
+            mp = MediaPlayer.create(this, R.raw.intro);
+            mp.setLooping(true);
+            mp.start();
         } else {
-            SysUtils.getInstance().stopPlayer();
+            mp.stop();
         }
     }
 }

@@ -11,9 +11,9 @@ import com.comyr.pg18.sevenhearts.game.resources.utils.OnPlayerStateChangedListe
 import com.comyr.pg18.sevenhearts.game.resources.utils.OnTableStateChangedListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.PlayerNotFoundException;
 import com.comyr.pg18.sevenhearts.ui.activities.GameActivity;
-import com.comyr.pg18.sevenhearts.ui.utils.GameData;
 import com.comyr.pg18.sevenhearts.ui.views.CardView;
 import com.comyr.pg18.sevenhearts.ui.views.PlayerView;
+import com.comyr.pg18.sevenhearts.utils.GameData;
 
 import java.util.Iterator;
 

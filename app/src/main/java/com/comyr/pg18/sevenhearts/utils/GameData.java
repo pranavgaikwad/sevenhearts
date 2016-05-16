@@ -1,4 +1,6 @@
-package com.comyr.pg18.sevenhearts.ui.utils;
+package com.comyr.pg18.sevenhearts.utils;
+
+import com.comyr.pg18.sevenhearts.game.solution.Solver;
 
 import java.util.Collections;
 import java.util.Random;
@@ -22,6 +24,8 @@ public class GameData {
      * generated everytime game starts
      */
     private static Stack<String> playerNames;
+
+    public static final int DIFFICULTY = Solver.DIFFICULTY_HARD;
 
     /**
      * initiates an empty stack of names

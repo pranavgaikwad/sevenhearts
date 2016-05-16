@@ -421,6 +421,8 @@ public class Table {
      * @return true if card can be played, false otherwise.
      */
     private boolean isCardSure(Card c, Player p) {
+        if (c.getRank() == 6) return true;
+        
         if (c.getRank() < 6) {
             if (p.hasCard(new Card(c.getRank() + 1, c.getSuit()))) return true;
             if (hasCard(new Card(c.getRank() + 1, c.getSuit()))) return true;

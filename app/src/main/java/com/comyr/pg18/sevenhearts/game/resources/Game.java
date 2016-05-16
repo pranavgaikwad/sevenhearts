@@ -81,7 +81,7 @@ public class Game implements OnTableStateChangedListener, OnPlayerStateChangedLi
                 table.incrementCurrentPlayerIndex();
                 continue;
             } else {
-                c = Solver.getNextMove(table.getAvailableMovesFor(p));
+                c = Solver.getNextMove(table.getAvailableMovesFor(p), p.getCards());
             }
             if (c == null) {
                 System.out.println("null card");

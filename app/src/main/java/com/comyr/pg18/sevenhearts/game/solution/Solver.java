@@ -2,9 +2,10 @@ package com.comyr.pg18.sevenhearts.game.solution;
 
 import com.comyr.pg18.sevenhearts.game.resources.Card;
 import com.comyr.pg18.sevenhearts.game.resources.Player;
-import com.comyr.pg18.sevenhearts.game.resources.Suit;
+import com.comyr.pg18.sevenhearts.utils.GameData;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Solver {
 
@@ -16,11 +17,14 @@ public class Solver {
     private static final int PIVOT_VALUE = 100;
     private static final int INFINITY = 99999;
 
+    public static final int DIFFICULTY_MEDIUM = 1;
+    public static final int DIFFICULTY_HARD = 2;
+
     /**
-     * value determines the importance of the card
-     * a card is important when it is closer to 7
-     *
-     * @return value as an integer
+     * Returns importance of the card as an integer named value.
+     * This method is only used for medium difficulty.
+     * @param c
+     * @return
      */
     private static int getCardValue(Card c) {
         int v = 0;
@@ -30,12 +34,22 @@ public class Solver {
         return v;
     }
 
+    private static int getImportanceForCard(Card c, ArrayList<Card> allCards) {
+        int baseImportance = getCardValue(c);
+        Iterator<Card> it = allCards.iterator();
+        while (it.hasNext()) {
+            Card ct = it.next();
+            if (ct.getSuit() == c.getSuit()) {
+                baseImportance = baseImportance - getCardValue(ct);
+            }
+        }
+        return baseImportance;
+    }
+
     /**
      * returns a favorable move for current state
      * of the game on the bases of possible cards
      * To obtain possible cards of a player,
-     * @see com.comyr.pg18.sevenhearts.game.resources.Table#getAvailableMovesFor(Player)
-     *
      * @return index of the card to play
      */
     private static int getIndexOfNextMove(ArrayList<Card> possibleCards) {
@@ -57,8 +71,27 @@ public class Solver {
      * @param possibleCards available moves that <b>can</b> be played
      * @return {@link Card} object
      */
-    public static Card getNextMove(ArrayList<Card> possibleCards) {
-        return possibleCards.get(getIndexOfNextMove(possibleCards));
+    public static Card getNextMove(ArrayList<Card> possibleCards, ArrayList<Card> allCards) {
+        switch (GameData.DIFFICULTY) {
+            case DIFFICULTY_HARD:
+                return possibleCards.get(getIndexOfNextMove(possibleCards, allCards));
+            case DIFFICULTY_MEDIUM:
+                return possibleCards.get(getIndexOfNextMove(possibleCards));
+        }
+        return possibleCards.get(0);
+    }
+
+    private static int getIndexOfNextMove(ArrayList<Card> possibleCards, ArrayList<Card> allCards) {
+        int importance = INFINITY;
+        int i = -1;
+        Iterator<Card> it = possibleCards.iterator();
+        while (it.hasNext()) {
+            Card c = it.next();
+            i++;
+            int imp = getImportanceForCard(c, allCards);
+            if (imp < importance) importance = imp;
+        }
+        return i;
     }
 
     /**

@@ -150,7 +150,7 @@ public class GameThread implements Runnable {
                     } else {
                         final Card ct;
                         synchronized (moveLock) {
-                            ct = Solver.getNextMove(Table.getAvailableMovesFor(currentPlayer));
+                            ct = Solver.getNextMove(Table.getAvailableMovesFor(currentPlayer), currentPlayer.getCards());
                         }
                         activity.runOnUiThread(new Runnable() {
                             @Override

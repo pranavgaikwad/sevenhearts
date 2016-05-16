@@ -1,6 +1,7 @@
 package com.comyr.pg18.sevenhearts.game.resources;
 
 import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
+import com.comyr.pg18.sevenhearts.game.resources.utils.OnCardStateChangedListener;
 
 public class Card {
     /**
@@ -27,6 +28,10 @@ public class Card {
      * unique identifier. (currently not used anywhere. to be used in {@link com.comyr.pg18.sevenhearts.game.solution.Solver})
      */
     private int identifier;
+    /**
+     * Listener that keeps track of changes in state of this card.
+     */
+    private OnCardStateChangedListener l;
 
     /**
      * initialize card with rank and suit as integers
@@ -116,6 +121,14 @@ public class Card {
         return this.rank - 1;
     }
 
+    public void setOnCardStateChangeListener(OnCardStateChangedListener l) {
+        this.l = l;
+    }
+
+    public void makeSure() {
+        if (l != null) l.onCardTurnedSure();
+    }
+
     @Override
     public boolean equals(Object obj) {
         // TODO Auto-generated method stub
@@ -131,6 +144,10 @@ public class Card {
 
     public String getBackgroundResourceName() {
         return rankName.toLowerCase() + "_of_" + suitName.toLowerCase();
+    }
+
+    public String getBackgroundResourceNameOnSure() {
+        return getBackgroundResourceName() + "_o";
     }
 
     public int compareTo(Card c) {

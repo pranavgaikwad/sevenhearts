@@ -4,7 +4,7 @@ import com.comyr.pg18.sevenhearts.game.resources.Card;
 import com.comyr.pg18.sevenhearts.game.resources.Player;
 import com.comyr.pg18.sevenhearts.game.resources.Table;
 
-public interface TableStateChangeListener {
+public interface OnTableStateChangedListener {
     void onCardAddedToTable(Table t, Card c);
 
     void onCardRemovedFromTable(Table t, Card c);

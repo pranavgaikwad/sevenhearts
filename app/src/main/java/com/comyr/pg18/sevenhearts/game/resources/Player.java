@@ -2,15 +2,11 @@ package com.comyr.pg18.sevenhearts.game.resources;
 
 import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
-import com.comyr.pg18.sevenhearts.game.resources.utils.PlayerStateChangeListener;
+import com.comyr.pg18.sevenhearts.game.resources.utils.OnPlayerStateChangedListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.CardNotFoundException;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
-
-import static java.util.Collections.sort;
 
 public class Player {
     /**
@@ -32,7 +28,7 @@ public class Player {
     /**
      * used to broadcast updated player state
      */
-    private PlayerStateChangeListener l;
+    private OnPlayerStateChangedListener l;
     /**
      * player arranges cards in suits
      * this variable is used as empty suit container
@@ -44,9 +40,9 @@ public class Player {
      * creates new player with
      *
      * @param name player name
-     * @param l    keeps updated with current player state {@link PlayerStateChangeListener}
+     * @param l    keeps updated with current player state {@link OnPlayerStateChangedListener}
      */
-    public Player(String name, PlayerStateChangeListener l) {
+    public Player(String name, OnPlayerStateChangedListener l) {
         this.name = name;
         this.l = l;
         this.id = name;
@@ -83,16 +79,16 @@ public class Player {
         return localSuits;
     }
 
-    public PlayerStateChangeListener getL() {
+    public OnPlayerStateChangedListener getL() {
         return l;
     }
 
     /**
      * re-arranges all the cards into suits
      *
-     * @param l state change listener {@link PlayerStateChangeListener}
+     * @param l state change listener {@link OnPlayerStateChangedListener}
      */
-    private void updateSuits(PlayerStateChangeListener l) {
+    private void updateSuits(OnPlayerStateChangedListener l) {
         Iterator<Suit> suitIterator = localSuits.iterator();
         while (suitIterator.hasNext()) {
             Suit s = suitIterator.next();

@@ -1,11 +1,9 @@
 package com.comyr.pg18.sevenhearts.game.resources;
 
-import android.util.Log;
-
 import com.comyr.pg18.sevenhearts.game.resources.constants.Cards;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
-import com.comyr.pg18.sevenhearts.game.resources.utils.TableStateChangeListener;
+import com.comyr.pg18.sevenhearts.game.resources.utils.OnTableStateChangedListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.NullTableException;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.PlayerNotFoundException;
 
@@ -52,7 +50,7 @@ public class Table {
     /**
      * used to broadcast changed table state
      */
-    private TableStateChangeListener l;
+    private OnTableStateChangedListener l;
     // following boolean value checks if any of the player has won or not
     // true if current player is first player to get removed from the table
     // a player is removed from the table as soon as he/she is out of cards.
@@ -64,7 +62,7 @@ public class Table {
      * @param l       used to keep updated with current state of the table
      * @param players {@link Player} objects as an array
      */
-    public Table(TableStateChangeListener l, Player... players) {
+    public Table(OnTableStateChangedListener l, Player... players) {
         // TODO Auto-generated constructor stub
         this.players = new ArrayList<Player>();
         this.cards = new ArrayList<Card>();
@@ -88,7 +86,7 @@ public class Table {
         }
     }
 
-    public static Table getInstance(TableStateChangeListener l, Player... players) {
+    public static Table getInstance(OnTableStateChangedListener l, Player... players) {
         if (instance == null) {
             instance = new Table(l, players);
         }

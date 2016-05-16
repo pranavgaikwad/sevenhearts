@@ -7,10 +7,13 @@ import com.comyr.pg18.sevenhearts.utils.PreferenceHelper;
 
 /**
  * @author Pranav
+ *
  * <h1>Game statistics manipulation</h1>
- * <p>This class has been created to manipulate game statistics.
+ * <p>
+ * This class has been created to manipulate game statistics.
  * Game statistics basically include numbers that keep track of below
- * mentioned properties.</p>
+ * mentioned properties.
+ * </p>
  * <ul>
  * <li>Total games played</li>
  * <li>Total games won</li>
@@ -18,22 +21,28 @@ import com.comyr.pg18.sevenhearts.utils.PreferenceHelper;
  * <li>Games played in one instance of the application</li>
  * <li>Total points scored (To be decided)</li>
  * </ul>
- * <p>This class is used to maintain achievements and leaderboards in Google
- * play games console.</p>
+ * <p>
+ * This class is used to maintain achievements and leaderboards in Google
+ * play games console.
+ * </p>
  */
 public class StatHelper {
     /**
+     * Listener to broadcast changes about game statistics.
+     * <p>
      * This class has various methods that perform operations on data
-     * related to player's statistics. For every such operation that
-     * takes place on player's statistics, {@link #l} will be used to call
-     * corresponding methods of {@link OnAchievementUnlockedListener}
+     * related to player's statistics.
+     * For every such operation that takes place on player's statistics, {@link #l} will be used to call
+     * corresponding methods of {@link OnAchievementUnlockedListener}.
      * Whichever class that implements {@link OnAchievementUnlockedListener} will be
      * able to receive statistics data.
-     * @see OnAchievementUnlockedListener#onGamesPlayed(int)
-     * @see OnAchievementUnlockedListener#onGamesWon(int)
-     * @see OnAchievementUnlockedListener#onGamesWonInRow(int)
+     * </p>
+     *
+     * @see {@link OnAchievementUnlockedListener#onGamesPlayed(int)}
+     * @see {@link OnAchievementUnlockedListener#onGamesWon(int)}
+     * @see {@link OnAchievementUnlockedListener#onGamesWonInRow(int)}
      */
-    public static OnAchievementUnlockedListener l;
+    private static OnAchievementUnlockedListener l;
 
     /**
      * Increments the count of total games played by the user by one.
@@ -90,7 +99,7 @@ public class StatHelper {
     }
 
     /**
-     * Re-initializes <b>'games won in a row'</b> to zero.
+     * Re-initializes <b>games won in a row</b> with zero.
      *
      * @param context {@link Context} of activity that calls this method.
      */

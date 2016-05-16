@@ -7,8 +7,8 @@ import com.comyr.pg18.sevenhearts.background.threads.GameThread;
 import com.comyr.pg18.sevenhearts.game.resources.Card;
 import com.comyr.pg18.sevenhearts.game.resources.Player;
 import com.comyr.pg18.sevenhearts.game.resources.Table;
-import com.comyr.pg18.sevenhearts.game.resources.utils.PlayerStateChangeListener;
-import com.comyr.pg18.sevenhearts.game.resources.utils.TableStateChangeListener;
+import com.comyr.pg18.sevenhearts.game.resources.utils.OnPlayerStateChangedListener;
+import com.comyr.pg18.sevenhearts.game.resources.utils.OnTableStateChangedListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.PlayerNotFoundException;
 import com.comyr.pg18.sevenhearts.ui.activities.GameActivity;
 import com.comyr.pg18.sevenhearts.ui.utils.GameData;
@@ -21,7 +21,7 @@ import java.util.Iterator;
  * Created by pranav on 5/6/16.
  * In package com.comyr.pg18.sevenhearts.background.tasks
  */
-public class GameInitTask extends AsyncTask<String, Void, String> implements PlayerStateChangeListener, TableStateChangeListener {
+public class GameInitTask extends AsyncTask<String, Void, String> implements OnPlayerStateChangedListener, OnTableStateChangedListener {
     private GameActivity gameActivity;
 
     public GameInitTask(GameActivity gameActivity) {
@@ -127,10 +127,9 @@ public class GameInitTask extends AsyncTask<String, Void, String> implements Pla
                     synchronized (gameActivity.getTable()) {
                         valid = gameActivity.getTable().isMoveValid(clickedCard);
                     }
-
                     if (!valid) return;
 
-                    GameActivity.getThread().setCurrentMove(((CardView) v).getCard());
+                    GameActivity.getThread().setCurrentMove(clickedCard);
                     GameActivity.getThread().resume();
                 }
             });

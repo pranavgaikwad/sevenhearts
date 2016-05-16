@@ -2,16 +2,15 @@ package com.comyr.pg18.sevenhearts.game.resources;
 
 import com.comyr.pg18.sevenhearts.game.resources.constants.Constants;
 import com.comyr.pg18.sevenhearts.game.resources.constants.Suits;
-import com.comyr.pg18.sevenhearts.game.resources.utils.PlayerStateChangeListener;
-import com.comyr.pg18.sevenhearts.game.resources.utils.TableStateChangeListener;
+import com.comyr.pg18.sevenhearts.game.resources.utils.OnPlayerStateChangedListener;
+import com.comyr.pg18.sevenhearts.game.resources.utils.OnTableStateChangedListener;
 import com.comyr.pg18.sevenhearts.game.resources.utils.exceptions.CardNotFoundException;
 import com.comyr.pg18.sevenhearts.game.solution.Solver;
-import com.comyr.pg18.sevenhearts.game.utils.FileHelper;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class Game implements TableStateChangeListener, PlayerStateChangeListener {
+public class Game implements OnTableStateChangedListener, OnPlayerStateChangedListener {
 
     private Table table;
     private Deck deck;
@@ -67,12 +66,12 @@ public class Game implements TableStateChangeListener, PlayerStateChangeListener
             Card c;
             String intro = "===========================================================\nMove : "
                     + String.valueOf(moves) + "\n" + "===========================================================\n";
-            FileHelper.getInstance().appendStringToGameFile(intro);
+
             Player p = table.getCurrentPlayer();
             String info = "Current player : " + p.getName() + "\n\n" + table.getOpenCardsAsString() + "\n\nPlayer's cards : "
                     + p.getStatus() + "\n\n" + "Count : " + String.valueOf(p.getCards().size()) + "\n\n" + "Open moves for current player : "
                     + table.getAvailableMovesFor(p).toString() + "\n\n" + table.getCardsStatus();
-            FileHelper.getInstance().appendStringToGameFile(info);
+
 
             /**
              * checks if the player has any cards available
@@ -146,7 +145,7 @@ public class Game implements TableStateChangeListener, PlayerStateChangeListener
     @Override
     public void onCardAddedToTable(Table t, Card c) {
         // TODO Auto-generated method stub
-        FileHelper.getInstance().appendStringToGameFile(c.toString() + " added...");
+
     }
 
     @Override
@@ -158,14 +157,14 @@ public class Game implements TableStateChangeListener, PlayerStateChangeListener
     @Override
     public void onPlayerAddedToTable(Table t, Player p) {
         // TODO Auto-generated method stub
-        FileHelper.getInstance().appendStringToGameFile(p.getName() + " added...");
+
     }
 
     @Override
     public void onPlayerRemovedFromTable(Table t, Player p) {
         // TODO Auto-generated method stub
         String removed = "==================================\n" + p.getName() + " removed...\n";
-        FileHelper.getInstance().appendStringToGameFile(removed);
+
     }
 
     @Override
@@ -178,7 +177,7 @@ public class Game implements TableStateChangeListener, PlayerStateChangeListener
     public void onTableFull(Table t) {
         // TODO Auto-generated method stub
         this.isFinished = true;
-        FileHelper.getInstance().appendStringToGameFile("===> Table full");
+
     }
 
     @Override
@@ -201,7 +200,7 @@ public class Game implements TableStateChangeListener, PlayerStateChangeListener
     public void onPlayerWon(Player p) {
         // TODO Auto-generated method stub
         isFinished = true;
-        FileHelper.getInstance().appendStringToGameFile("Player won : " + p.getName());
+
     }
 
     @Override

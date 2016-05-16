@@ -9,19 +9,21 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.comyr.pg18.sevenhearts.game.resources.Card;
+import com.comyr.pg18.sevenhearts.game.resources.utils.OnCardStateChangedListener;
 import com.comyr.pg18.sevenhearts.ui.utils.CustomResolution;
 import com.comyr.pg18.sevenhearts.ui.utils.helper.ResolutionHelper;
 
 /**
  * Created by pranav on 5/1/16.
  */
-public class CardView extends Button {
+public class CardView extends Button implements OnCardStateChangedListener {
     /**
-     * {@link Card} object linked with current {@link CardView}
+     * Object of {@link Card} linked with this view.
      */
     private Card card;
     /**
-     * height and width of the card is determined programmatically
+     * Height and width in pixels for this view.
+     * Height and width of the card is determined programmatically
      * according to actual screen size of the device in pixels
      * following values are thus, calculated at runtime.
      */
@@ -63,6 +65,7 @@ public class CardView extends Button {
         ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(res.getWidth(), res.getHeight());
         setLayoutParams(params);
         setBackgroundResource(getResources().getIdentifier(card.getBackgroundResourceName(), "drawable", getContext().getPackageName()));
+        card.setOnCardStateChangeListener(this);
     }
 
     /**
@@ -84,6 +87,23 @@ public class CardView extends Button {
         params.setMargins(0, 10, 0, 0);
         setLayoutParams(params);
         setBackgroundResource(getResources().getIdentifier(card.getBackgroundResourceName(), "drawable", getContext().getPackageName()));
+        card.setOnCardStateChangeListener(this);
+    }
+
+    /**
+     * Makes the card stroke blue.
+     * <p>
+     * Whenever this card turns sure (card can be played on table), the border
+     * of the card turns blue from black.
+     * Changing the border will highlight the card and it will be easy for the
+     * user to decide what to play, among all available cards which have turned
+     * blue.
+     * To make the card turn blue, we will make use of drawables for two different
+     * states of the card.
+     * </p>
+     */
+    public void turnCardSure() {
+        setBackgroundResource(getResources().getIdentifier(card.getBackgroundResourceNameOnSure(), "drawable", getContext().getPackageName()));
     }
 
     /**
@@ -92,9 +112,13 @@ public class CardView extends Button {
      */
     public void setNegativeMargin() {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(widthInPixels, heightInPixels);
-        int marginInDp = ResolutionHelper.getInstance().convertPixelsToDp((float) (widthInPixels / 1.1), getContext());
+        int marginInDp = ResolutionHelper.getInstance().convertPixelsToDp((float) (widthInPixels / 1.2), getContext());
         params.setMargins(marginInDp * -1, 0, 0, 0);
         setLayoutParams(params);
     }
 
+    @Override
+    public void onCardTurnedSure() {
+        turnCardSure();
+    }
 }
